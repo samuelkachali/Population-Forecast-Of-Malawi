@@ -60,13 +60,16 @@ export default function Forecast() {
 
   const { addNotification } = useNotification();
 
+  // Use the deployed model API base URL for all requests
+  const MODEL_API_BASE_URL = "https://population-forecast-of-malawi-1.onrender.com";
+
   // Fetch predicted regressors from backend
   const handlePredictRegressors = async () => {
     setLoading(true);
     setError('');
     setPopulationData(null); // Clear old population prediction
     try {
-      const response = await fetch('/predict_regressors', {
+      const response = await fetch(`${MODEL_API_BASE_URL}/predict_regressors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ years: yearsArray }),
@@ -99,7 +102,7 @@ export default function Forecast() {
       // Send the regressors as expected by the backend
       const payload = { regressors: regressorsData };
       console.log("Payload to /predict_population:", payload);
-      const response = await fetch('/predict_population', {
+      const response = await fetch(`${MODEL_API_BASE_URL}/predict_population`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -138,7 +141,7 @@ export default function Forecast() {
       populationChartImage = populationChartRef.current.canvas.toDataURL('image/png');
     }
     try {
-      const response = await fetch('/api/reports/generate', {
+      const response = await fetch(`${MODEL_API_BASE_URL}/api/reports/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
