@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config(); // Load environment variables
 
+//code
 const authRoutes = require('./routes/auth'); // Import auth routes
 const reportsRouter = require('./routes/reports');
 const userRoutes = require('./routes/users');
