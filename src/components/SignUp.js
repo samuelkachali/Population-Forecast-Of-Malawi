@@ -39,7 +39,7 @@ const SignUp = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

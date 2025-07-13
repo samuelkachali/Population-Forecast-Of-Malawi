@@ -86,7 +86,8 @@ const UserManagement = () => {
       setError(null);
       const token = localStorage.getItem('token');
       console.log('UserManagement fetch token:', token);
-      const url = '/api/users';
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+      const url = `${API_BASE_URL}/api/users`;
       console.log('UserManagement fetch URL:', url);
       
       if (!token) {
@@ -165,7 +166,8 @@ const UserManagement = () => {
 
   const handleDelete = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      const result = await handleApiCall(`/api/users/${userId}`, { method: 'DELETE' });
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+      const result = await handleApiCall(`${API_BASE_URL}/api/users/${userId}`, { method: 'DELETE' });
       if (result) {
         setUsers(users.filter((user) => user.id !== userId));
         setFilteredUsers(filteredUsers.filter((user) => user.id !== userId));
@@ -175,7 +177,8 @@ const UserManagement = () => {
 
   const handleMakeAdmin = async (userId) => {
     if (window.confirm('Are you sure you want to make this user an admin?')) {
-      const result = await handleApiCall(`/api/users/${userId}/make-admin`, { method: 'PUT' });
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+      const result = await handleApiCall(`${API_BASE_URL}/api/users/${userId}/make-admin`, { method: 'PUT' });
       if (result) {
         setUsers(users.map((user) => (user.id === userId ? { ...user, role: 'admin' } : user)));
         setFilteredUsers(filteredUsers.map((user) => (user.id === userId ? { ...user, role: 'admin' } : user)));
@@ -214,7 +217,8 @@ const UserManagement = () => {
   };
 
   const handleSave = async () => {
-    const result = await handleApiCall(`/api/users/${editingUser.id}`, {
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+    const result = await handleApiCall(`${API_BASE_URL}/api/users/${editingUser.id}`, {
       method: 'PUT',
       body: JSON.stringify(formData),
     });

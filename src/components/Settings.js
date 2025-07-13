@@ -4,8 +4,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../contexts/ThemeContext';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
-
 const Settings = ({ user, setUser }) => {
   const [profile, setProfile] = useState(user || { name: '', email: '' });
   const [theme, setTheme] = useState(user?.theme || 'light');
@@ -39,6 +37,7 @@ const Settings = ({ user, setUser }) => {
     setError('');
     try {
       const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
       const res = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'PATCH',
         headers: {
@@ -84,6 +83,7 @@ const Settings = ({ user, setUser }) => {
     setError('');
     try {
       const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
       const res = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'PATCH',
         headers: {
@@ -116,6 +116,7 @@ const Settings = ({ user, setUser }) => {
     setError('');
     try {
       const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
       const res = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'DELETE',
         headers: {

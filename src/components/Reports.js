@@ -7,7 +7,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useNotification } from '../contexts/NotificationContext';
 import { useUser } from '../contexts/UserContext';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
 
 const Reports = () => {
   const [reports, setReports] = useState(null);
@@ -18,7 +18,7 @@ const Reports = () => {
   const { user } = useUser();
 
   useEffect(() => {
-    fetch('/api/reports')
+    fetch(`${API_BASE_URL}/api/reports`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch reports');
         return res.json();
@@ -170,7 +170,7 @@ const Reports = () => {
                         variant="outlined"
                         color="primary"
                         size="small"
-                        href={`${API_BASE_URL}${report.url}?t=${new Date(report.date).getTime()}`}
+                        href={`${API_BASE_URL}/api${report.url}?t=${new Date(report.date).getTime()}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         sx={{ ml: { xs: 1, md: 2 }, minWidth: { xs: 80, md: 100 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}
@@ -182,7 +182,7 @@ const Reports = () => {
                         variant="contained"
                         color="primary"
                         size="small"
-                        href={`${API_BASE_URL}${report.url}?t=${new Date(report.date).getTime()}`}
+                        href={`${API_BASE_URL}/api${report.url}?t=${new Date(report.date).getTime()}`}
                         download
                         sx={{ ml: { xs: 1, md: 2 }, minWidth: { xs: 80, md: 100 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                         startIcon={report.type === 'pdf' ? <PictureAsPdfIcon /> : <InsertDriveFileIcon />}

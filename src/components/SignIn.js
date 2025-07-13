@@ -46,8 +46,7 @@ const SignIn = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { setUser } = useUser();
 
-  // Use relative path for API calls to leverage proxy
-  const API_BASE_URL = '';
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,7 +54,7 @@ const SignIn = () => {
     setError('');
 
     try {
-      const response = await fetch(`/api/auth/signin`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
