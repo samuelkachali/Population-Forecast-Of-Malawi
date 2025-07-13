@@ -132,13 +132,19 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
   const { populationTrend, ageDistribution, regionalDistribution } = dashboardData;
 
   return (
-    <Box>
-      <Grid container spacing={4} alignItems="stretch" justifyContent="center" sx={{ mb: 4, flexWrap: 'wrap' }}>
+    <Box sx={{ width: '100%', minHeight: '100vh', py: 4 }}>
+      <Grid
+        container
+        spacing={4}
+        justifyContent="center"
+        alignItems="center"
+        sx={{ mb: 4 }}
+      >
         {Array.isArray(statsArray) && statsArray.length > 0 ? (
           statsArray.map((stat, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index} sx={{ display: 'flex' }}>
-              <StatCard sx={{ mb: 4, minHeight: 160, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', boxSizing: 'border-box' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <StatCard sx={{ mb: 4, minHeight: 160, width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
                   <StatIcon color={stat.color}>{ICONS[stat.icon]}</StatIcon>
                   <Box>
                     <Typography variant="subtitle1" color="textSecondary">
@@ -170,11 +176,11 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
         )}
       </Grid>
 
-      <Grid container spacing={4} mt={2}>
-        <Grid item xs={12} md={8}>
-          <StyledCard>
+      <Grid container spacing={4} justifyContent="center" alignItems="flex-start" mt={2}>
+        <Grid item xs={12} md={8} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <StyledCard sx={{ width: '100%', maxWidth: 700, mx: 'auto' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom align="center">
                 Population Trend
               </Typography>
               <ChartContainer>
@@ -188,41 +194,39 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
           </StyledCard>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Stack spacing={3}>
-            <StyledCard>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Age Distribution
-                </Typography>
-                <ChartContainer sx={{ height: 240 }}>
-                  {ageDistribution && typeof ageDistribution === 'object' && Array.isArray(ageDistribution.datasets) && ageDistribution.datasets.length > 0 ? (
-                    <Doughnut data={ageDistribution} options={{ ...chartOptions, cutout: '70%' }} />
-                  ) : (
-                    <Typography color="textSecondary" align="center">No age distribution data available.</Typography>
-                  )}
-                </ChartContainer>
-              </CardContent>
-            </StyledCard>
+        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <StyledCard sx={{ width: '100%', maxWidth: 350, mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom align="center">
+                Age Distribution
+              </Typography>
+              <ChartContainer sx={{ height: 240 }}>
+                {ageDistribution && typeof ageDistribution === 'object' && Array.isArray(ageDistribution.datasets) && ageDistribution.datasets.length > 0 ? (
+                  <Doughnut data={ageDistribution} options={{ ...chartOptions, cutout: '70%' }} />
+                ) : (
+                  <Typography color="textSecondary" align="center">No age distribution data available.</Typography>
+                )}
+              </ChartContainer>
+            </CardContent>
+          </StyledCard>
 
-            <StyledCard>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Regional Population
-                </Typography>
-                <ChartContainer sx={{ height: 240 }}>
-                  {regionalDistribution && typeof regionalDistribution === 'object' && Array.isArray(regionalDistribution.datasets) && regionalDistribution.datasets.length > 0 ? (
-                    <Bar
-                      data={regionalDistribution}
-                      options={{ ...chartOptions, indexAxis: 'y' }}
-                    />
-                  ) : (
-                    <Typography color="textSecondary" align="center">No regional distribution data available.</Typography>
-                  )}
-                </ChartContainer>
-              </CardContent>
-            </StyledCard>
-          </Stack>
+          <StyledCard sx={{ width: '100%', maxWidth: 350 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom align="center">
+                Regional Population
+              </Typography>
+              <ChartContainer sx={{ height: 240 }}>
+                {regionalDistribution && typeof regionalDistribution === 'object' && Array.isArray(regionalDistribution.datasets) && regionalDistribution.datasets.length > 0 ? (
+                  <Bar
+                    data={regionalDistribution}
+                    options={{ ...chartOptions, indexAxis: 'y' }}
+                  />
+                ) : (
+                  <Typography color="textSecondary" align="center">No regional distribution data available.</Typography>
+                )}
+              </ChartContainer>
+            </CardContent>
+          </StyledCard>
         </Grid>
       </Grid>
     </Box>
