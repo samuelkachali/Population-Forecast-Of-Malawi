@@ -44,7 +44,8 @@ const HealthMetrics = ({ healthData }) => {
       chartImage = chartRef.current.canvas.toDataURL('image/png');
     }
     try {
-      const response = await fetch('/api/reports/generate', {
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+      const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -89,13 +89,15 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+
   const handleGenerateReport = async () => {
     let chartImage = null;
     if (chartRef.current && chartRef.current.canvas) {
       chartImage = chartRef.current.canvas.toDataURL('image/png');
     }
     try {
-      const response = await fetch('/api/reports/generate', {
+      const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,7 +119,7 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
       setPredLoading(true);
       setPredError(null);
       try {
-        const response = await fetch('http://localhost:8000/api/train-predictions');
+        const response = await fetch(`${API_BASE_URL}/api/train-predictions`);
         const data = await response.json();
         setTrainData(data);
       } catch (err) {

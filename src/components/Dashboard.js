@@ -90,8 +90,8 @@ const ChartContainer = styled(Box)({
   position: 'relative',
 });
 
-// Use relative path for API calls to leverage proxy
-const API_BASE_URL = '';
+// Use environment variable for API base URL
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
 
 const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => {
   const ICONS = {
@@ -259,15 +259,15 @@ const Dashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
       try {
         const [statsRes, trendRes, ageRes, regionalRes, demographicsRes, healthRes, growthRes, analyticsRes, urbanRuralRes] = await Promise.all([
-          fetch(`/api/dashboard/stats`, { headers }),
-          fetch(`/api/dashboard/population-trend`, { headers }),
-          fetch(`/api/dashboard/age-distribution`, { headers }),
-          fetch(`/api/dashboard/regional-distribution`, { headers }),
-          fetch(`/api/dashboard/demographics`, { headers }),
-          fetch(`/api/dashboard/health-metrics`, { headers }),
-          fetch(`/api/dashboard/growth-analysis`, { headers }),
-          fetch(`/api/dashboard/analytics`, { headers }),
-          fetch(`/api/dashboard/urban-rural`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/population-trend`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/age-distribution`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/regional-distribution`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/demographics`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/health-metrics`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/growth-analysis`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/analytics`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/urban-rural`, { headers }),
         ]);
 
         if (!statsRes.ok || !trendRes.ok || !ageRes.ok || !regionalRes.ok || !demographicsRes.ok || !healthRes.ok || !growthRes.ok || !analyticsRes.ok || !urbanRuralRes.ok) {

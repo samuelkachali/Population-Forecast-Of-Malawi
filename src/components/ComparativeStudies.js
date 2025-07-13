@@ -77,7 +77,8 @@ const ComparativeStudies = () => {
       setError(null);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('/api/dashboard/comparative-studies', {
+        const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/comparative-studies`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
