@@ -175,7 +175,8 @@ const MobileHeroSection = () => {
           zIndex: 2,
           width: '100%',
           minHeight: '80vh',
-          px: 3,
+          px: 2,
+          pt: 8, // Add more top padding for mobile
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -185,18 +186,18 @@ const MobileHeroSection = () => {
         <Typography
           variant="subtitle2"
           fontWeight={700}
-          sx={{ color: theme.palette.success.light, letterSpacing: 1, mb: 1, textTransform: 'uppercase', fontSize: '0.95rem' }}
+          sx={{ color: theme.palette.success.light, letterSpacing: 1, mb: 1, textTransform: 'uppercase', fontSize: '0.9rem', textAlign: 'center' }}
         >
           Forecasting <span style={{ color: '#f88070' }}>Malawi's Future</span>—Powered by <span style={{ color: '#f88070' }}>Data</span>.
         </Typography>
         {/* Two-line centered heading */}
         <Typography
-          variant="h4"
+          variant="h5"
           fontWeight={800}
           sx={{
             color: '#fff',
             mb: 0.5,
-            fontSize: { xs: '0.95rem', sm: '1.05rem' },
+            fontSize: { xs: '1.15rem', sm: '1.25rem' },
             lineHeight: 1.18,
             letterSpacing: 0.5,
             background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
@@ -210,12 +211,12 @@ const MobileHeroSection = () => {
           Accurate, accessible,
         </Typography>
         <Typography
-          variant="h4"
+          variant="h5"
           fontWeight={800}
           sx={{
             color: '#fff',
             mb: 2,
-            fontSize: { xs: '0.95rem', sm: '1.05rem' },
+            fontSize: { xs: '1.15rem', sm: '1.25rem' },
             lineHeight: 1.18,
             letterSpacing: 0.5,
             background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',

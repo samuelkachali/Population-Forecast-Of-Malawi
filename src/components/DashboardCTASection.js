@@ -27,8 +27,8 @@ const DashboardCTASection = () => {
           maxWidth: 540,
           width: '100%',
           mx: 'auto',
-          px: { xs: 3, sm: 5 },
-          py: { xs: 5, sm: 7 },
+          px: { xs: 2, sm: 5 },
+          py: { xs: 3, sm: 7 },
           borderRadius: 5,
           boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
           backdropFilter: 'blur(12px) saturate(160%)',
@@ -40,11 +40,11 @@ const DashboardCTASection = () => {
           alignItems: 'center',
         }}
       >
-        <InsertChartIcon sx={{ fontSize: 40, color: 'primary.main', mb: 2, animation: 'pulse 1.6s infinite alternate' }} />
+        <InsertChartIcon sx={{ fontSize: 32, color: 'primary.main', mb: 1, animation: 'pulse 1.6s infinite alternate' }} />
         <Typography
-          variant="h4"
+          variant="h5"
           fontWeight={800}
-          mb={2}
+          mb={1.5}
           sx={{
             background: 'linear-gradient(90deg,rgb(63, 158, 93) 0%,rgb(52, 129, 98) 100%)',
             WebkitBackgroundClip: 'text',
@@ -52,36 +52,36 @@ const DashboardCTASection = () => {
             color: '#257a5a',
             letterSpacing: 1,
             textShadow: '0 2px 8px rgba(24,28,36,0.18)',
+            fontSize: { xs: '1.15rem', sm: '1.5rem', md: '2.2rem' },
           }}
         >
           Ready to Forecast the Future?
         </Typography>
         <Typography
-          variant="h6"
-          sx={{ color: '#444', mb: 4, fontWeight: 400 }}
+          variant="body2"
+          sx={{ mb: 2, color: '#333', fontSize: { xs: '0.95rem', sm: '1.05rem' } }}
         >
           Dive into our interactive dashboard to explore trends and forecast Malawi's population growth.
         </Typography>
         <Button
           variant="contained"
           size="large"
-          startIcon={<InsertChartIcon />}
           sx={{
-            fontWeight: 700,
-            px: 5,
-            py: 2,
-            fontSize: '1.18rem',
+            mt: 2,
+            px: 3,
+            py: 1.2,
+            fontSize: { xs: '1rem', sm: '1.1rem' },
             borderRadius: 3,
-            boxShadow: 4,
-            background: 'linear-gradient(90deg,#257a5a 60%, #43e97b 100%)',
+            fontWeight: 700,
+            background: 'linear-gradient(90deg, #257a5a 0%, #43e97b 100%)',
             color: '#fff',
-            transition: 'box-shadow 0.3s, background 0.3s',
+            boxShadow: '0 2px 8px rgba(33,150,243,0.10)',
             '&:hover': {
-              background: 'linear-gradient(90deg,#257a5a 60%, #38f9d7 100%)',
-              opacity: 0.95,
+              background: 'linear-gradient(90deg, #43e97b 0%, #257a5a 100%)',
             },
           }}
-          onClick={() => navigate('/dashboard/overview')}
+          startIcon={<InsertChartIcon />}
+          onClick={() => navigate('/dashboard')}
         >
           Explore the Dashboard
         </Button>
