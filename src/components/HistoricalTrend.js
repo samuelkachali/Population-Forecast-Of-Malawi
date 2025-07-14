@@ -233,15 +233,7 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
           {/* Generate Report Button - only if real populationTrend data is available */}
           {hasData && (
             <Box sx={{ textAlign: 'center', mt: 3 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleGenerateReport}
-                size="large"
-                sx={{ mr: 2 }}
-              >
-                Generate Report
-              </Button>
+              {/* Removed Generate Report button */}
               <Button
                 variant="outlined"
                 color="primary"

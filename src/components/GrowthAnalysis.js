@@ -40,30 +40,6 @@ const GrowthAnalysis = ({ growthData }) => {
   const data = (growthData && growthData.labels && growthData.datasets) ? growthData : mockGrowthData;
   const explanation = `The Growth Analysis section visualizes Malawi's annual population growth rate using the latest data from the World Bank.\n\n- The growth rate is the percentage change in population from one year to the next.\n- This metric helps identify periods of rapid or slow population change, which is vital for planning in health, education, and infrastructure.\n- The chart displays the most recent years with available data.\n\nA steady or rising growth rate can indicate a young, expanding population, while a declining rate may signal demographic transition or the impact of health and social policies.`;
 
-  const handleGenerateReport = async () => {
-    let chartImage = null;
-    if (chartRef.current && chartRef.current.canvas) {
-      chartImage = chartRef.current.canvas.toDataURL('image/png');
-    }
-    try {
-      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
-      const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          growthData: data,
-          chartImage,
-          explanation,
-          reportType: 'growth-analysis',
-        }),
-      });
-      if (!response.ok) throw new Error('Failed to generate report');
-      setReportStatus({ open: true, message: 'Report generated successfully!', error: false });
-    } catch (err) {
-      setReportStatus({ open: true, message: 'Failed to generate report.', error: true });
-    }
-  };
-
   // Simple animated background component
   const AnimatedBackground = () => (
     <Box
@@ -168,19 +144,6 @@ const GrowthAnalysis = ({ growthData }) => {
               </CardContent>
             </Card>
           </Fade>
-          {/* Generate Report Button - only if real growthData is available */}
-          {growthData && growthData.labels && growthData.datasets && (
-            <Box sx={{ textAlign: 'center', mt: 3 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleGenerateReport}
-                size="large"
-              >
-                Generate Report
-              </Button>
-            </Box>
-          )}
           <Snackbar
             open={reportStatus.open}
             autoHideDuration={4000}

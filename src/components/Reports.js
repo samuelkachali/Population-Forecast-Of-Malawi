@@ -1,79 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Fade, List, ListItem, ListItemText, ListItemIcon, TextField, InputAdornment, IconButton, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Card, CardContent, Fade, List, ListItem, ListItemIcon, ListItemText, Button } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import SearchIcon from '@mui/icons-material/Search';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useNotification } from '../contexts/NotificationContext';
-import { useUser } from '../contexts/UserContext';
+import PeopleIcon from '@mui/icons-material/People';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import MapIcon from '@mui/icons-material/Map';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+const reportCategories = [
+  {
+    key: 'demographics',
+    title: 'Demographics Report',
+    icon: <PeopleIcon color="primary" />, 
+    summary: 'Overview of Malawi’s population structure, age groups, and gender distribution.'
+  },
+  {
+    key: 'forecasts',
+    title: 'Forecasts Report',
+    icon: <TimelineIcon color="secondary" />, 
+    summary: 'Population forecasts for coming years based on current trends and models.'
+  },
+  {
+    key: 'regional',
+    title: 'Regional Data Report',
+    icon: <MapIcon color="success" />, 
+    summary: 'Population and demographic breakdown by region.'
+  },
+  {
+    key: 'growth',
+    title: 'Growth Analysis Report',
+    icon: <TrendingUpIcon color="action" />, 
+    summary: 'Analysis of annual population growth rates and trends.'
+  },
+  {
+    key: 'health',
+    title: 'Health Metrics Report',
+    icon: <HealthAndSafetyIcon color="error" />, 
+    summary: 'Key health indicators and metrics impacting population dynamics.'
+  },
+];
+
+const reportPreviews = {
+  demographics: (
+    <Box>
+      <Typography variant="h6">Demographics Report (Preview)</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        Malawi’s population is predominantly young, with over 50% under the age of 18. The gender ratio is nearly balanced. Urbanization is increasing, but most people still live in rural areas.
+      </Typography>
+    </Box>
+  ),
+  forecasts: (
+    <Box>
+      <Typography variant="h6">Forecasts Report (Preview)</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        The population is projected to reach 25 million by 2030, with continued growth expected in both urban and rural areas. Fertility rates are gradually declining.
+      </Typography>
+    </Box>
+  ),
+  regional: (
+    <Box>
+      <Typography variant="h6">Regional Data Report (Preview)</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        The Southern region is the most populous, followed by the Central and Northern regions. Urban centers like Lilongwe and Blantyre are experiencing the fastest growth.
+      </Typography>
+    </Box>
+  ),
+  growth: (
+    <Box>
+      <Typography variant="h6">Growth Analysis Report (Preview)</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        Annual growth rates have remained steady at around 2.7%. Monitoring these trends is vital for planning in health, education, and infrastructure.
+      </Typography>
+    </Box>
+  ),
+  health: (
+    <Box>
+      <Typography variant="h6">Health Metrics Report (Preview)</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        Life expectancy is improving, but challenges remain in infant mortality and access to basic sanitation. Continued investment in healthcare is needed.
+      </Typography>
+    </Box>
+  ),
+};
 
 const Reports = () => {
-  const [reports, setReports] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [search, setSearch] = useState('');
-  const { addNotification } = useNotification();
-  const { user } = useUser();
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/reports`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch reports');
-        return res.json();
-      })
-      .then(data => {
-        setReports(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Failed to load reports.');
-        setLoading(false);
-      });
-  }, []);
-
-  const filteredReports = (reports || []).filter(r =>
-    r.title.toLowerCase().includes(search.toLowerCase()) ||
-    r.summary.toLowerCase().includes(search.toLowerCase())
-  );
-
-  useEffect(() => {
-    if (!reports) return;
-    const notified = JSON.parse(localStorage.getItem('notified_reports') || '{}');
-    const now = new Date();
-    reports.forEach(report => {
-      const reportDate = new Date(report.date);
-      const daysDiff = (now - reportDate) / (1000 * 60 * 60 * 24);
-      if (daysDiff <= 7 && !notified[report.title]) {
-        addNotification({
-          message: `New report: ${report.title}`,
-          link: '/dashboard/reports',
-        });
-        notified[report.title] = true;
-      }
-    });
-    localStorage.setItem('notified_reports', JSON.stringify(notified));
-  }, [reports, addNotification]);
-
-  const handleDeleteReport = async (filename) => {
-    if (!window.confirm('Are you sure you want to delete this report?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/reports/${filename}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete report');
-      setReports((prev) => prev.filter((r) => !r.url.includes(filename)));
-      // Add notification for deletion
-      addNotification({
-        message: `Report deleted: ${filename}`,
-        link: '/dashboard/reports',
-      });
-    } catch (err) {
-      alert('Failed to delete report.');
-    }
-  };
-
-  if (loading) return <Box textAlign="center" mt={4}><Typography>Loading reports...</Typography></Box>;
-  if (error) return <Box textAlign="center" mt={4}><Typography color="error">{error}</Typography></Box>;
+  const [selected, setSelected] = useState(null);
 
   return (
     <Box sx={{ mt: { xs: 1, md: 2 }, mb: { xs: 2, md: 4 }, px: { xs: 1, sm: 2, md: 4 }, maxWidth: 900, mx: 'auto' }}>
@@ -110,28 +121,8 @@ const Reports = () => {
               px: { xs: 1, md: 0 }
             }}
           >
-            Download or view detailed reports on Malawi's population, regions, education, and more.
+            Browse different categories of reports. Click a category to preview its summary.
           </Typography>
-          <Box sx={{ mb: { xs: 2, md: 3 }, display: 'flex', justifyContent: 'center' }}>
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Search reports..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ 
-                width: { xs: '100%', sm: 320 },
-                maxWidth: '100%'
-              }}
-            />
-          </Box>
           <Card sx={{ 
             borderRadius: { xs: 3, md: 5 }, 
             background: 'rgba(227,234,252,0.7)', 
@@ -140,70 +131,28 @@ const Reports = () => {
           }}>
             <CardContent>
               <List>
-                {filteredReports.length === 0 && (
-                  <ListItem>
-                    <ListItemText primary="No reports found." />
+                {reportCategories.map((cat) => (
+                  <ListItem
+                    key={cat.key}
+                    button
+                    selected={selected === cat.key}
+                    onClick={() => setSelected(cat.key)}
+                    alignItems="flex-start"
+                    divider
+                  >
+                    <ListItemIcon>{cat.icon}</ListItemIcon>
+                    <ListItemText
+                      primary={cat.title}
+                      secondary={cat.summary}
+                    />
                   </ListItem>
-                )}
-                {filteredReports.map((report, idx) => {
-                  const filename = report.url.split('/').pop();
-                  return (
-                    <ListItem key={idx} alignItems="flex-start" divider>
-                      <ListItemIcon>
-                        {report.type === 'pdf' ? <PictureAsPdfIcon color="error" /> : <InsertDriveFileIcon color="primary" />}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={report.title}
-                        secondary={
-                          <>
-                            <Typography component="span" variant="body2" color="text.secondary">
-                              {report.summary}
-                            </Typography>
-                            <br />
-                            <Typography component="span" variant="caption" color="text.secondary">
-                              {new Date(report.date).toLocaleDateString()}
-                            </Typography>
-                          </>
-                        }
-                      />
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        href={`${API_BASE_URL}/api${report.url}?t=${new Date(report.date).getTime()}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{ ml: { xs: 1, md: 2 }, minWidth: { xs: 80, md: 100 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}
-                        startIcon={<InsertDriveFileIcon />}
-                      >
-                        View
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        href={`${API_BASE_URL}/api${report.url}?t=${new Date(report.date).getTime()}`}
-                        download
-                        sx={{ ml: { xs: 1, md: 2 }, minWidth: { xs: 80, md: 100 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}
-                        startIcon={report.type === 'pdf' ? <PictureAsPdfIcon /> : <InsertDriveFileIcon />}
-                      >
-                        Download
-                      </Button>
-                      {user && user.role === 'admin' && (
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          sx={{ ml: { xs: 1, md: 2 }, minWidth: { xs: 80, md: 100 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}
-                          onClick={() => handleDeleteReport(filename)}
-                        >
-                          Delete
-                        </Button>
-                      )}
-                    </ListItem>
-                  );
-                })}
+                ))}
               </List>
+              {selected && (
+                <Box sx={{ mt: 3, p: 2, background: '#f5f7fa', borderRadius: 3 }}>
+                  {reportPreviews[selected]}
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Box>

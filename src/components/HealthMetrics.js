@@ -130,18 +130,7 @@ const HealthMetrics = ({ healthData }) => {
           </CardContent>
         </Card>
           {/* Generate Report Button - only if real healthData is available */}
-          {healthData && Array.isArray(healthData.datasets) && (
-            <Box sx={{ textAlign: 'center', mt: 3 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleGenerateReport}
-                size="large"
-              >
-                Generate Report
-              </Button>
-            </Box>
-          )}
+          {/* Removed Generate Report button */}
           <Snackbar
             open={reportStatus.open}
             autoHideDuration={4000}

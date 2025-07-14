@@ -362,18 +362,7 @@ export default function Forecast() {
       )}
 
       {/* Generate Report Button - appears only if both regressors and predictions are available */}
-      {regressorsData && populationData && (
-        <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleGenerateReport}
-            size="large"
-          >
-            Generate Report
-          </Button>
-        </Box>
-      )}
+      {/* Removed Generate Report button and related logic */}
       <Snackbar
         open={reportStatus.open}
         autoHideDuration={4000}
