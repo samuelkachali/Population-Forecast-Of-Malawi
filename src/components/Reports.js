@@ -6,6 +6,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import MapIcon from '@mui/icons-material/Map';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import Snackbar from '@mui/material/Snackbar';
 
 const reportCategories = [
   {
@@ -83,8 +84,140 @@ const reportPreviews = {
   ),
 };
 
+// Mock data for reports (as used in original components)
+const mockForecastRegressors = [
+  { ds: '2025', 'Population by 1-year age groups and sex': 1000000, 'Life expectancy E(x) - complete': 65, 'Urban population growth (annual %)': 4.2 },
+  { ds: '2026', 'Population by 1-year age groups and sex': 1020000, 'Life expectancy E(x) - complete': 65.2, 'Urban population growth (annual %)': 4.3 },
+];
+const mockForecastPredictions = [
+  { ds: '2025', Predicted_Population: 21000000, Lower_Bound: 20800000, Upper_Bound: 21200000 },
+  { ds: '2026', Predicted_Population: 21500000, Lower_Bound: 21300000, Upper_Bound: 21700000 },
+];
+const mockGrowthData = {
+  labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+  datasets: [
+    {
+      label: 'Growth Rate (%)',
+      data: [2.7, 2.6, 2.5, 2.6, 2.7, 2.8],
+      backgroundColor: '#00ab55',
+      borderRadius: 8,
+      barPercentage: 0.6,
+    },
+  ],
+  yearRange: '2018-2023',
+};
+const mockHealthData = {
+  labels: ['Life Expectancy', 'Infant Mortality', 'Access to Healthcare'],
+  datasets: [
+    {
+      label: 'Value',
+      data: [65, 38, 62],
+      backgroundColor: ['#00ab55', '#ff5630', '#3366FF'],
+      borderRadius: 8,
+    },
+  ],
+  year: 2023,
+};
+const mockTrend = {
+  labels: ['2000', '2005', '2010', '2015', '2020', '2023'],
+  datasets: [
+    {
+      label: 'Population (Millions)',
+      data: [11.6, 13.1, 14.9, 16.8, 19.1, 20.5],
+      borderColor: '#3366FF',
+      backgroundColor: 'rgba(51,102,255,0.08)',
+      fill: true,
+      tension: 0.4,
+    },
+  ],
+};
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+
 const Reports = () => {
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', error: false });
+
+  // Helper to download a file from a URL
+  const downloadFile = (url, filename) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handler for downloading each report type
+  const handleDownload = async (type) => {
+    setLoading(true);
+    setError('');
+    try {
+      let payload = {};
+      let filename = '';
+      if (type === 'forecasts') {
+        // In a real app, get the user's actual forecast data from context or state
+        payload = {
+          regressors: mockForecastRegressors,
+          predictions: mockForecastPredictions,
+          regressorsChartImage: undefined, // Could be added if available
+          populationChartImage: undefined, // Could be added if available
+        };
+        filename = 'forecast_report.pdf';
+      } else if (type === 'growth') {
+        payload = {
+          growthData: mockGrowthData,
+          chartImage: undefined,
+          explanation: 'The Growth Analysis section visualizes Malawi\'s annual population growth rate using the latest data from the World Bank.',
+          reportType: 'growth-analysis',
+        };
+        filename = 'growth_analysis_report.pdf';
+      } else if (type === 'health') {
+        payload = {
+          healthData: mockHealthData,
+          chartImage: undefined,
+          explanation: 'The Health Metrics section provides a visual summary of key health indicators for Malawi.',
+          reportType: 'health-metrics',
+        };
+        filename = 'health_metrics_report.pdf';
+      } else if (type === 'demographics') {
+        // No backend support, so just download a static PDF or show a message
+        setSnackbar({ open: true, message: 'Demographics PDF not implemented.', error: true });
+        setLoading(false);
+        return;
+      } else if (type === 'regional') {
+        setSnackbar({ open: true, message: 'Regional Data PDF not implemented.', error: true });
+        setLoading(false);
+        return;
+      } else if (type === 'historical') {
+        payload = {
+          populationTrend: mockTrend,
+          chartImage: undefined,
+          explanation: 'The Historical Population Trend chart visualizes Malawi\'s population changes over time.',
+          reportType: 'historical-trend',
+        };
+        filename = 'historical_trend_report.pdf';
+      }
+      const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error('Failed to generate report');
+      const data = await response.json();
+      if (!data.url) throw new Error('No PDF URL returned');
+      // Download the PDF
+      downloadFile(`${API_BASE_URL}/api${data.url}`, filename);
+      setSnackbar({ open: true, message: 'Report downloaded!', error: false });
+    } catch (err) {
+      setError(err.message || 'Failed to download report');
+      setSnackbar({ open: true, message: err.message || 'Failed to download report', error: true });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ mt: { xs: 1, md: 2 }, mb: { xs: 2, md: 4 }, px: { xs: 1, sm: 2, md: 4 }, maxWidth: 900, mx: 'auto' }}>
@@ -121,7 +254,7 @@ const Reports = () => {
               px: { xs: 1, md: 0 }
             }}
           >
-            Browse different categories of reports. Click a category to preview its summary.
+            Browse different categories of reports. Click a category to preview its summary and download a PDF.
           </Typography>
           <Card sx={{ 
             borderRadius: { xs: 3, md: 5 }, 
@@ -151,12 +284,32 @@ const Reports = () => {
               {selected && (
                 <Box sx={{ mt: 3, p: 2, background: '#f5f7fa', borderRadius: 3 }}>
                   {reportPreviews[selected]}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}
+                    disabled={loading}
+                    onClick={() => handleDownload(selected)}
+                  >
+                    {loading ? 'Generating PDF...' : 'Download PDF'}
+                  </Button>
+                  {error && (
+                    <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
+                  )}
                 </Box>
               )}
             </CardContent>
           </Card>
         </Box>
       </Fade>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        message={snackbar.message}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        ContentProps={{ style: { backgroundColor: snackbar.error ? '#d32f2f' : '#43a047', color: '#fff' } }}
+      />
     </Box>
   );
 };
