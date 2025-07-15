@@ -33,6 +33,7 @@ import Reports from './Reports';
 import Demographics from './Demographics';
 import Settings from './Settings';
 import { useUser } from '../contexts/UserContext';
+import { useGrowth } from '../contexts/GrowthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
@@ -240,6 +241,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const { setGrowthData } = useGrowth();
 
   const retryFetch = () => {
     setRefreshKey((prev) => prev + 1);
@@ -285,6 +287,7 @@ const Dashboard = () => {
         const urbanRuralData = await urbanRuralRes.json();
 
         setDashboardData({ stats, populationTrend, ageDistribution, regionalDistribution, demographicsData, healthData, growthData, analyticsData, urbanRuralData });
+        setGrowthData(growthData); // Ensure context is updated with real data
       } catch (err) {
         setError(err.message);
       } finally {
