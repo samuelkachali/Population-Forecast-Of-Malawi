@@ -31,10 +31,18 @@ export const NotificationProvider = ({ children }) => {
     setNotifications((prev) => prev.map(n => ({ ...n, read: true })));
   }, []);
 
+  const removeNotification = useCallback((id) => {
+    setNotifications((prev) => prev.filter(n => n.id !== id));
+  }, []);
+
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, addNotification, markAllAsRead }}>
+    <NotificationContext.Provider value={{ notifications, unreadCount, addNotification, markAllAsRead, removeNotification, clearAllNotifications }}>
       {children}
     </NotificationContext.Provider>
   );

@@ -19,6 +19,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useNotification } from '../contexts/NotificationContext';
@@ -47,7 +48,7 @@ const DashboardHeader = ({ onToggleSidebar }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const { user, loading } = useUser();
-  const { notifications, unreadCount, markAllAsRead } = useNotification();
+  const { notifications, unreadCount, markAllAsRead, removeNotification, clearAllNotifications } = useNotification();
   const handleNotificationClick = useCallback((notif) => {
     if (notif.link) {
       handleNotifClose();
@@ -265,9 +266,14 @@ const DashboardHeader = ({ onToggleSidebar }) => {
         >
           <Box sx={{ p: 2, borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="subtitle1" fontWeight={700}>Notifications</Typography>
-            <IconButton size="small" onClick={markAllAsRead} title="Mark all as read">
-              <DoneAllIcon fontSize="small" />
-            </IconButton>
+            <Box>
+              <IconButton size="small" onClick={markAllAsRead} title="Mark all as read">
+                <DoneAllIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={clearAllNotifications} title="Clear all notifications">
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
           <List dense disablePadding>
             {notifications.length === 0 && (
@@ -285,6 +291,11 @@ const DashboardHeader = ({ onToggleSidebar }) => {
                   transition: 'background 0.2s',
                 }}
                 onClick={() => handleNotificationClick(notif)}
+                secondaryAction={
+                  <IconButton edge="end" size="small" onClick={e => { e.stopPropagation(); removeNotification(notif.id); }}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                }
               >
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <NotificationsIcon color={notif.read ? 'disabled' : 'primary'} fontSize="small" />
