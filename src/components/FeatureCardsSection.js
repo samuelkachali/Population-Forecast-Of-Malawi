@@ -23,7 +23,7 @@ const steps = [
   },
 ];
 
-const transition = { duration: 0.6, ease: 'easeInOut' };
+const transition = { duration: 3, ease: 'easeInOut' };
 
 const FeatureCardsSection = () => {
   const theme = useTheme();
