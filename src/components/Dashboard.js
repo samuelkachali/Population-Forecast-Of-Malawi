@@ -35,7 +35,6 @@ import Settings from './Settings';
 import { useUser } from '../contexts/UserContext';
 import { useGrowth } from '../contexts/GrowthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { ReactGrandTour, useGrandTour } from 'react-grand-tour';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
 const drawerWidth = 300;
@@ -377,12 +376,6 @@ const Dashboard = () => {
             </Box>
           ) : (
             <>
-              <ReactGrandTour
-                steps={tourSteps}
-                open={showTour}
-                onClose={handleTourClose}
-                stylingOverrides={{ primaryColor: '#257a5a' }}
-              />
               <Routes>
                 <Route
                   path=""
