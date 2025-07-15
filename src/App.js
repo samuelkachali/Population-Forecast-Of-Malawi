@@ -15,6 +15,10 @@ import GrowthAnalysis from './components/GrowthAnalysis';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { UserProvider } from './contexts/UserContext';
+import { ForecastProvider } from './contexts/ForecastContext';
+import { GrowthProvider } from './contexts/GrowthContext';
+import { HealthProvider } from './contexts/HealthContext';
+import { HistoricalProvider } from './contexts/HistoricalContext';
 
 function AppRoutes() {
   // Use the inactivity timer hook (60 minutes timeout, 5 minutes warning)
@@ -98,9 +102,17 @@ function App() {
       <NotificationProvider>
         <ThemeProvider>
           <AppThemeProvider>
-            <Router>
-              <AppRoutes />
-            </Router>
+            <ForecastProvider>
+              <GrowthProvider>
+                <HealthProvider>
+                  <HistoricalProvider>
+                    <Router>
+                      <AppRoutes />
+                    </Router>
+                  </HistoricalProvider>
+                </HealthProvider>
+              </GrowthProvider>
+            </ForecastProvider>
           </AppThemeProvider>
         </ThemeProvider>
       </NotificationProvider>
