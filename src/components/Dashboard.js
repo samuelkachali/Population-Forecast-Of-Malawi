@@ -103,6 +103,7 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
     TrendingUpIcon: <TrendingUpIcon />,
   };
   const { user } = useUser();
+  const displayName = user?.name || user?.fullName || user?.username || (user?.email ? user.email.split('@')[0] : '');
 
   const chartOptions = {
     responsive: true,
@@ -182,9 +183,9 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 220 }}>
         <Paper elevation={2} sx={{ borderRadius: 4, p: { xs: 3, md: 5 }, maxWidth: 600, width: '100%', textAlign: 'center', background: 'linear-gradient(120deg, #f5f7fa 0%, #e3eafc 100%)' }}>
           <Typography variant="h5" fontWeight={800} sx={{ mb: 2, color: 'primary.main', letterSpacing: 1 }}>
-            {user?.name ? (
+            {displayName ? (
               <>
-                Welcome, <Box component="span" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #257a5a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 900 }}>{user.name.split(' ')[0]}</Box>!
+                Welcome, <Box component="span" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #257a5a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 900 }}>{displayName}</Box>!
               </>
             ) : (
               'Welcome!'
