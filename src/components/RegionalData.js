@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Fade } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+import { RegionalContext } from '../contexts/RegionalContext';
 
 const chartOptions = {
   responsive: true,
@@ -32,6 +33,12 @@ const mockRegionalData = {
 };
 
 const RegionalData = ({ regionalData }) => {
+  const { setRegionalData } = useContext(RegionalContext);
+  useEffect(() => {
+    if (regionalData) {
+      setRegionalData(regionalData);
+    }
+  }, [regionalData, setRegionalData]);
   const year = regionalData && regionalData.year;
   return (
     <Box sx={{ mt: { xs: 1, md: 2 }, mb: { xs: 2, md: 4 }, px: { xs: 1, sm: 2, md: 4 } }}>

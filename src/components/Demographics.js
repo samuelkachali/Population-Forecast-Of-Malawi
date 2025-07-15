@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Grid, Fade } from '@mui/material';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PeopleIcon from '@mui/icons-material/People';
+import { DemographicsContext } from '../contexts/DemographicsContext';
 
 const mockDemographicsData = {
   gender: {
@@ -47,6 +48,12 @@ const chartOptions = {
 };
 
 const Demographics = ({ demographicsData }) => {
+  const { setDemographicsData } = useContext(DemographicsContext);
+  useEffect(() => {
+    if (demographicsData) {
+      setDemographicsData(demographicsData);
+    }
+  }, [demographicsData, setDemographicsData]);
   const genderData = demographicsData && demographicsData.gender && Array.isArray(demographicsData.gender.datasets)
     ? demographicsData.gender
     : mockDemographicsData.gender;

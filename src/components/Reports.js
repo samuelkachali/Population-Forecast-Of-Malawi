@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Typography, Card, CardContent, Fade, List, ListItem, ListItemIcon, ListItemText, Button } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import PeopleIcon from '@mui/icons-material/People';
@@ -11,6 +11,8 @@ import { useForecast } from '../contexts/ForecastContext';
 import { useGrowth } from '../contexts/GrowthContext';
 import { useHealth } from '../contexts/HealthContext';
 import { useHistorical } from '../contexts/HistoricalContext';
+import { DemographicsContext } from '../contexts/DemographicsContext';
+import { RegionalContext } from '../contexts/RegionalContext';
 
 const reportCategories = [
   {
@@ -149,6 +151,8 @@ const Reports = () => {
   const { growthData, explanation: growthExplanation } = useGrowth();
   const { healthData, explanation: healthExplanation } = useHealth();
   const { populationTrend, explanation: historicalExplanation } = useHistorical();
+  const { demographicsData } = useContext(DemographicsContext);
+  const { regionalData } = useContext(RegionalContext);
 
   // Helper to download a file from a URL
   const downloadFile = (url, filename) => {
@@ -196,13 +200,23 @@ const Reports = () => {
         filename = 'health_metrics_report.pdf';
         explanation = healthExplanation;
       } else if (type === 'demographics') {
-        setSnackbar({ open: true, message: 'Demographics PDF not implemented.', error: true });
+        if (!demographicsData) {
+          setSnackbar({ open: true, message: 'No demographics data available.', error: true });
         setLoading(false);
-        return;
+          return;
+        }
+        payload = { demographicsData };
+        filename = 'demographics_report.pdf';
+        explanation = 'This report provides an overview of Malawi\'s population structure, age groups, and gender distribution.';
       } else if (type === 'regional') {
-        setSnackbar({ open: true, message: 'Regional Data PDF not implemented.', error: true });
+        if (!regionalData) {
+          setSnackbar({ open: true, message: 'No regional data available.', error: true });
         setLoading(false);
-        return;
+          return;
+        }
+        payload = { regionalData };
+        filename = 'regional_report.pdf';
+        explanation = 'This report provides a population and demographic breakdown by region.';
       } else if (type === 'historical') {
         payload = {
           populationTrend,
@@ -324,15 +338,16 @@ const Reports = () => {
                       </Typography>
                     )
                   ) : (
-                    <Button
+                        <Button
                       variant="contained"
                       color="primary"
                       sx={{ mt: 2 }}
-                      disabled
+                      disabled={!demographicsData || !regionalData}
+                      onClick={() => handleDownload(selected)}
                     >
-                      Not available
-                    </Button>
-                  )}
+                      {loading ? 'Generating PDF...' : 'Download PDF'}
+                        </Button>
+                      )}
                   {error && (
                     <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
                   )}

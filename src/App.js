@@ -19,6 +19,8 @@ import { ForecastProvider } from './contexts/ForecastContext';
 import { GrowthProvider } from './contexts/GrowthContext';
 import { HealthProvider } from './contexts/HealthContext';
 import { HistoricalProvider } from './contexts/HistoricalContext';
+import { DemographicsProvider } from './contexts/DemographicsContext';
+import { RegionalProvider } from './contexts/RegionalContext';
 
 function AppRoutes() {
   // Use the inactivity timer hook (60 minutes timeout, 5 minutes warning)
@@ -102,17 +104,21 @@ function App() {
       <NotificationProvider>
         <ThemeProvider>
           <AppThemeProvider>
-            <ForecastProvider>
-              <GrowthProvider>
-                <HealthProvider>
-                  <HistoricalProvider>
-                    <Router>
-                      <AppRoutes />
-                    </Router>
-                  </HistoricalProvider>
-                </HealthProvider>
-              </GrowthProvider>
-            </ForecastProvider>
+            <DemographicsProvider>
+              <RegionalProvider>
+                <ForecastProvider>
+                  <GrowthProvider>
+                    <HealthProvider>
+                      <HistoricalProvider>
+                        <Router>
+                          <AppRoutes />
+                        </Router>
+                      </HistoricalProvider>
+                    </HealthProvider>
+                  </GrowthProvider>
+                </ForecastProvider>
+              </RegionalProvider>
+            </DemographicsProvider>
           </AppThemeProvider>
         </ThemeProvider>
       </NotificationProvider>
