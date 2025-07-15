@@ -52,6 +52,7 @@ const Demographics = ({ demographicsData }) => {
   useEffect(() => {
     if (demographicsData) {
       setDemographicsData(demographicsData);
+      console.log("Set demographics context:", demographicsData);
     }
   }, [demographicsData, setDemographicsData]);
   const genderData = demographicsData && demographicsData.gender && Array.isArray(demographicsData.gender.datasets)

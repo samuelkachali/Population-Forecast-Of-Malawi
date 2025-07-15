@@ -153,6 +153,7 @@ const Reports = () => {
   const { populationTrend, explanation: historicalExplanation } = useHistorical();
   const { demographicsData } = useContext(DemographicsContext);
   const { regionalData } = useContext(RegionalContext);
+  console.log("Demographics context in Reports:", demographicsData);
 
   // Helper to download a file from a URL
   const downloadFile = (url, filename) => {
