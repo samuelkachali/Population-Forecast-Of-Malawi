@@ -78,26 +78,36 @@ const ValueCell = styled(TableCell)(({ theme, diff }) => ({
   fontSize: '1rem',
 }));
 
-const HistoricalTrend = () => {
+// Accept populationTrend as a prop
+const HistoricalTrend = ({ populationTrend: propPopulationTrend }) => {
   const { populationTrend, setPopulationTrend, explanation, setExplanation } = useHistorical();
 
-  // Use context value as initial state
-  const [trend, setTrend] = useState(populationTrend || {
-    labels: ['2000', '2005', '2010', '2015', '2020', '2023'],
-    datasets: [
-      {
-        label: 'Population (Millions)',
-        data: [11.6, 13.1, 14.9, 16.8, 19.1, 20.5],
-        borderColor: '#3366FF',
-        backgroundColor: 'rgba(51,102,255,0.08)',
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  });
+  // Prefer prop, then context, then mock
+  const [trend, setTrend] = useState(
+    propPopulationTrend ||
+    populationTrend ||
+    {
+      labels: ['2000', '2005', '2010', '2015', '2020', '2023'],
+      datasets: [
+        {
+          label: 'Population (Millions)',
+          data: [11.6, 13.1, 14.9, 16.8, 19.1, 20.5],
+          borderColor: '#3366FF',
+          backgroundColor: 'rgba(51,102,255,0.08)',
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    }
+  );
 
-  // Keep context in sync with local state
-  React.useEffect(() => { setPopulationTrend(trend); }, [trend, setPopulationTrend]);
+  // Sync context/local state if prop changes
+  React.useEffect(() => {
+    if (propPopulationTrend) {
+      setTrend(propPopulationTrend);
+      setPopulationTrend(propPopulationTrend);
+    }
+  }, [propPopulationTrend, setPopulationTrend]);
   React.useEffect(() => { setExplanation(explanationText); }, []);
 
   const explanationText = `The Historical Population Trend chart visualizes Malawi's population changes over time using the latest available data from the World Bank.\n\n- The chart shows the total population for each year, highlighting periods of rapid growth or demographic shifts.\n- Understanding these trends is crucial for policy, planning, and anticipating future needs in areas like health, education, and infrastructure.\n- The data is sourced from the World Bank and reflects the most recent historical records.\n\nA steady upward trend indicates sustained population growth, while plateaus or dips may signal demographic transitions or the impact of external events.`;
