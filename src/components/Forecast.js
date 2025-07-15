@@ -242,6 +242,73 @@ export default function Forecast() {
     };
   }, [populationData]);
 
+  // Modern chart options for regressors
+  const regressorsChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { boxWidth: 24, font: { size: 14, weight: 'bold' } }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        backgroundColor: '#fff',
+        titleColor: '#212B36',
+        bodyColor: '#212B36',
+        borderColor: '#1976d2',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${Number(ctx.parsed.y).toLocaleString()}`
+        }
+      },
+      title: { display: false },
+    },
+    elements: {
+      line: { tension: 0.4, borderWidth: 3 },
+      point: { radius: 5, borderWidth: 2, hoverRadius: 7, backgroundColor: '#fff' }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 13 } } },
+      y: { grid: { color: '#e3eafc' }, ticks: { font: { size: 13 } } }
+    },
+  };
+  // Modern chart options for predictions
+  const populationChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { boxWidth: 24, font: { size: 14, weight: 'bold' } }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        backgroundColor: '#fff',
+        titleColor: '#212B36',
+        bodyColor: '#212B36',
+        borderColor: '#d32f2f',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${Number(ctx.parsed.y).toLocaleString()}`
+        }
+      },
+      title: { display: false },
+    },
+    elements: {
+      line: { tension: 0.4, borderWidth: 3 },
+      point: { radius: 5, borderWidth: 2, hoverRadius: 7, backgroundColor: '#fff' }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 13 } } },
+      y: { grid: { color: '#fbe9e7' }, ticks: { font: { size: 13 } } }
+    },
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom align="center" sx={{ mb: 3 }}>
@@ -304,9 +371,11 @@ export default function Forecast() {
             <Typography variant="h6" gutterBottom>
               Predicted Regressors
             </Typography>
-            <Line data={regressorsChartData} ref={regressorsChartRef} />
-            </CardContent>
-          </Card>
+            <Box sx={{ height: 350 }}>
+              <Line data={regressorsChartData} options={regressorsChartOptions} ref={regressorsChartRef} />
+            </Box>
+          </CardContent>
+        </Card>
       )}
 
       {/* Regressors Table */}
@@ -349,7 +418,9 @@ export default function Forecast() {
             <Typography variant="h6" gutterBottom>
               Predicted Population
             </Typography>
-            <Line data={populationChartData} ref={populationChartRef} />
+            <Box sx={{ height: 350 }}>
+              <Line data={populationChartData} options={populationChartOptions} ref={populationChartRef} />
+            </Box>
           </CardContent>
         </Card>
       )}
