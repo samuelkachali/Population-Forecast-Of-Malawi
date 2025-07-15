@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Box,
   Typography,
@@ -227,30 +227,42 @@ export default function Forecast() {
     if (!Array.isArray(populationData) || populationData.length === 0) return null;
     return {
       labels: populationData.map((d) => d.ds),
-    datasets: [
-      {
+      datasets: [
+        {
           label: 'Predicted Population',
           data: populationData.map((d) => d.Predicted_Population),
-          borderColor: '#d32f2f',
-          fill: false,
+          backgroundColor: '#3366FF',
+          borderRadius: 8,
         },
         {
           label: 'Lower Bound',
           data: populationData.map((d) => d.Lower_Bound),
-          borderColor: '#f44336',
-          borderDash: [5, 5],
-          fill: false,
+          backgroundColor: '#00ab55',
+          borderRadius: 8,
         },
         {
           label: 'Upper Bound',
           data: populationData.map((d) => d.Upper_Bound),
-          borderColor: '#f44336',
-          borderDash: [5, 5],
-          fill: false,
+          backgroundColor: '#ff9f43',
+          borderRadius: 8,
         },
       ],
     };
   }, [populationData]);
+
+  const populationBarOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      title: { display: false },
+      tooltip: { mode: 'index', intersect: false },
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: '#e3eafc' } },
+    },
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -364,7 +376,9 @@ export default function Forecast() {
             <Typography variant="h6" gutterBottom>
               Predicted Population
             </Typography>
-            <Line data={populationChartData} ref={populationChartRef} />
+            <Box sx={{ height: { xs: 200, sm: 250, md: 300 } }}>
+              <Bar data={populationChartData} options={populationBarOptions} ref={populationChartRef} />
+            </Box>
           </CardContent>
         </Card>
       )}
