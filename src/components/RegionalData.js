@@ -2,9 +2,9 @@ import React, { useContext, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Fade } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { RegionalContext } from '../contexts/RegionalContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-import { RegionalContext } from '../contexts/RegionalContext';
 
 const chartOptions = {
   responsive: true,
