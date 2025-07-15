@@ -9,6 +9,7 @@ import {
   CardContent,
   CircularProgress,
   Button,
+  Paper,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -131,8 +132,7 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
 
   if (!dashboardData) return <Typography>No data available.</Typography>;
 
-  const { populationTrend, ageDistribution, regionalDistribution } = dashboardData;
-
+  // Only keep the three stat cards
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', py: 4 }}>
       <Grid
@@ -177,60 +177,17 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
           </Grid>
         )}
       </Grid>
-
-      <Grid container spacing={4} justifyContent="center" alignItems="flex-start" mt={2}>
-        <Grid item xs={12} md={8} sx={{ display: 'flex', justifyContent: 'center' }}>
-          <StyledCard sx={{ width: '100%', maxWidth: 700, mx: 'auto' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom align="center">
-                Population Trend
-              </Typography>
-              <ChartContainer>
-                {populationTrend && typeof populationTrend === 'object' && Array.isArray(populationTrend.datasets) && populationTrend.datasets.length > 0 ? (
-                  <Line data={populationTrend} options={chartOptions} />
-                ) : (
-                  <Typography color="textSecondary" align="center">No population trend data available.</Typography>
-                )}
-              </ChartContainer>
-            </CardContent>
-          </StyledCard>
-        </Grid>
-
-        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-          <StyledCard sx={{ width: '100%', maxWidth: 350, mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom align="center">
-                Age Distribution
-              </Typography>
-              <ChartContainer sx={{ height: 240 }}>
-                {ageDistribution && typeof ageDistribution === 'object' && Array.isArray(ageDistribution.datasets) && ageDistribution.datasets.length > 0 ? (
-                  <Doughnut data={ageDistribution} options={{ ...chartOptions, cutout: '70%' }} />
-                ) : (
-                  <Typography color="textSecondary" align="center">No age distribution data available.</Typography>
-                )}
-              </ChartContainer>
-            </CardContent>
-          </StyledCard>
-
-          <StyledCard sx={{ width: '100%', maxWidth: 350 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom align="center">
-                Regional Population
-              </Typography>
-              <ChartContainer sx={{ height: 240 }}>
-                {regionalDistribution && typeof regionalDistribution === 'object' && Array.isArray(regionalDistribution.datasets) && regionalDistribution.datasets.length > 0 ? (
-                  <Bar
-                    data={regionalDistribution}
-                    options={{ ...chartOptions, indexAxis: 'y' }}
-                  />
-                ) : (
-                  <Typography color="textSecondary" align="center">No regional distribution data available.</Typography>
-                )}
-              </ChartContainer>
-            </CardContent>
-          </StyledCard>
-        </Grid>
-      </Grid>
+      {/* Welcome message instead of charts */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 220 }}>
+        <Paper elevation={2} sx={{ borderRadius: 4, p: { xs: 3, md: 5 }, maxWidth: 600, width: '100%', textAlign: 'center', background: 'linear-gradient(120deg, #f5f7fa 0%, #e3eafc 100%)' }}>
+          <Typography variant="h5" fontWeight={700} sx={{ mb: 2, color: 'primary.main' }}>
+            Welcome to your dashboard!
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Explore the latest population insights and forecasts for Malawi. Use the sidebar to navigate to detailed analytics, reports, and more.
+          </Typography>
+        </Paper>
+      </Box>
     </Box>
   );
 };
