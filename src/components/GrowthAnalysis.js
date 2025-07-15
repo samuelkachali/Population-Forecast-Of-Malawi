@@ -41,22 +41,15 @@ const GrowthAnalysis = () => {
 
   const { growthData, setGrowthData, explanation, setExplanation } = useGrowth();
 
-  // Use context value as initial state
-  const [data, setData] = useState(growthData || {
-    labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
-    datasets: [
-      {
-        label: 'Growth Rate (%)',
-        data: [2.7, 2.6, 2.5, 2.6, 2.7, 2.8],
-        backgroundColor: '#00ab55',
-        borderRadius: 8,
-        barPercentage: 0.6,
-      },
-    ],
-    yearRange: '2018-2023',
-  });
+  // Debug log to see what data is being received
+  console.log("GrowthAnalysis growthData:", growthData);
 
-  // Keep context in sync with local state
+  // Use real backend data if available, otherwise fallback to mock data
+  const data = (growthData && Array.isArray(growthData.labels) && growthData.labels.length > 0 && Array.isArray(growthData.datasets) && growthData.datasets.length > 0)
+    ? growthData
+    : mockGrowthData;
+
+  // Keep context in sync with real data
   React.useEffect(() => { setGrowthData(data); }, [data, setGrowthData]);
   React.useEffect(() => { setExplanation(explanationText); }, []);
 
