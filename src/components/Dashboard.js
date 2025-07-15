@@ -35,6 +35,7 @@ import Settings from './Settings';
 import { useUser } from '../contexts/UserContext';
 import { useGrowth } from '../contexts/GrowthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
+import { ReactGrandTour, useGrandTour } from 'react-grand-tour';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
 const drawerWidth = 300;
@@ -242,6 +243,40 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const { setGrowthData } = useGrowth();
+  const [showTour, setShowTour] = useState(false);
+  const tourSteps = [
+    {
+      selector: '#sidebar-tour',
+      content: 'Navigate between dashboard features here.',
+    },
+    {
+      selector: '#forecast-tour',
+      content: 'Set your years and click here to predict regressors.',
+    },
+    {
+      selector: '#predict-population-tour',
+      content: 'After regressors, click here to predict population.',
+    },
+    {
+      selector: '#reports-tour',
+      content: 'Download your generated reports here.',
+    },
+    {
+      selector: '#settings-tour',
+      content: 'Update your profile and preferences here.',
+    },
+  ];
+
+  useEffect(() => {
+    if (localStorage.getItem('tutorialCompleted') !== 'true') {
+      setShowTour(true);
+    }
+  }, []);
+
+  const handleTourClose = () => {
+    setShowTour(false);
+    localStorage.setItem('tutorialCompleted', 'true');
+  };
 
   const retryFetch = () => {
     setRefreshKey((prev) => prev + 1);
@@ -308,7 +343,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
-      <Sidebar open={sidebarOpen} onToggle={handleSidebarToggle} />
+      <Sidebar open={sidebarOpen} onToggle={handleSidebarToggle} id="sidebar-tour" />
       <Box
         sx={{
           flexGrow: 1,
@@ -340,71 +375,44 @@ const Dashboard = () => {
             >
               <CircularProgress size={60} />
             </Box>
-          ) : error ? (
-            <Box
-              sx={{
-                textAlign: 'center',
-                py: { xs: 4, md: 8 },
-                px: { xs: 2, md: 4 },
-              }}
-            >
-              <Typography
-                variant="h5"
-                color="error"
-                gutterBottom
-                sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}
-              >
-                Error loading data
-              </Typography>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ mb: 3, fontSize: { xs: '0.875rem', md: '1rem' } }}
-              >
-                {error}
-              </Typography>
-              <Button
-                variant="contained"
-                onClick={retryFetch}
-                sx={{
-                  px: { xs: 2, md: 3 },
-                  py: { xs: 1, md: 1.5 },
-                  fontSize: { xs: '0.875rem', md: '1rem' },
-                }}
-              >
-                Try Again
-              </Button>
-            </Box>
           ) : (
-            <Routes>
-              <Route
-                path=""
-                element={
-                  <DashboardOverview
-                    dashboardData={dashboardData}
-                    loading={loading}
-                    error={error}
-                    setRefreshKey={setRefreshKey}
-                  />
-                }
+            <>
+              <ReactGrandTour
+                steps={tourSteps}
+                open={showTour}
+                onClose={handleTourClose}
+                stylingOverrides={{ primaryColor: '#257a5a' }}
               />
-              <Route path="overview" element={<PopulationOverview stats={dashboardData?.stats} />} />
-              <Route path="forecast" element={<Forecast />} />
-              <Route path="history" element={<HistoricalTrend populationTrend={dashboardData?.populationTrend} />} />
-              <Route path="growth" element={<GrowthAnalysis growthData={dashboardData?.growthData} />} />
-              <Route path="compare" element={<ComparativeStudies />} />
-              <Route path="age-groups" element={<AgeDistribution realAgeDistribution={dashboardData?.ageDistribution?.real} mockAgeDistribution={dashboardData?.ageDistribution?.mock} />} />
-              <Route path="regions" element={<RegionalData regionalData={dashboardData?.regionalDistribution} />} />
-              <Route path="urban-rural" element={<UrbanRural urbanRuralData={dashboardData?.urbanRuralData} />} />
-              <Route path="education" element={<EducationStats />} />
-              <Route path="health" element={<HealthMetrics healthData={dashboardData?.healthData} />} />
-              <Route path="analytics" element={<Analytics analyticsData={dashboardData?.analyticsData} />} />
-              <Route path="demographics" element={<Demographics demographicsData={dashboardData?.demographicsData} />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="user-management" element={<UserManagement />} />
-              <Route path="*" element={<Navigate to="overview" replace />} />
-            </Routes>
+              <Routes>
+                <Route
+                  path=""
+                  element={
+                    <DashboardOverview
+                      dashboardData={dashboardData}
+                      loading={loading}
+                      error={error}
+                      setRefreshKey={setRefreshKey}
+                    />
+                  }
+                />
+                <Route path="overview" element={<PopulationOverview stats={dashboardData?.stats} />} />
+                <Route path="forecast" element={<Forecast id="forecast-tour" />} />
+                <Route path="history" element={<HistoricalTrend populationTrend={dashboardData?.populationTrend} />} />
+                <Route path="growth" element={<GrowthAnalysis growthData={dashboardData?.growthData} />} />
+                <Route path="compare" element={<ComparativeStudies />} />
+                <Route path="age-groups" element={<AgeDistribution realAgeDistribution={dashboardData?.ageDistribution?.real} mockAgeDistribution={dashboardData?.ageDistribution?.mock} />} />
+                <Route path="regions" element={<RegionalData regionalData={dashboardData?.regionalDistribution} />} />
+                <Route path="urban-rural" element={<UrbanRural urbanRuralData={dashboardData?.urbanRuralData} />} />
+                <Route path="education" element={<EducationStats />} />
+                <Route path="health" element={<HealthMetrics healthData={dashboardData?.healthData} />} />
+                <Route path="analytics" element={<Analytics analyticsData={dashboardData?.analyticsData} />} />
+                <Route path="demographics" element={<Demographics demographicsData={dashboardData?.demographicsData} />} />
+                <Route path="reports" element={<Reports id="reports-tour" />} />
+                <Route path="settings" element={<Settings id="settings-tour" />} />
+                <Route path="user-management" element={<UserManagement />} />
+                <Route path="*" element={<Navigate to="overview" replace />} />
+              </Routes>
+            </>
           )}
         </Box>
       </Box>

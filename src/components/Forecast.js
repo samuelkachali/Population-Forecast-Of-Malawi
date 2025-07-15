@@ -302,21 +302,23 @@ export default function Forecast() {
             onClick={handlePredictRegressors}
             disabled={loading || forecastEnd < forecastStart}
             fullWidth
+            id="forecast-tour"
           >
             {loading ? 'Predicting...' : 'Predict Regressors'}
           </Button>
-                </Grid>
+        </Grid>
         <Grid item xs={12} sm={3}>
-                  <Button
+          <Button
             variant="outlined"
             onClick={handlePredictPopulation}
             disabled={loading || !regressorsData}
-                    fullWidth
-                  >
+            fullWidth
+            id="predict-population-tour"
+          >
             {loading ? 'Predicting...' : 'Predict Population'}
-                  </Button>
-                </Grid>
-              </Grid>
+          </Button>
+        </Grid>
+      </Grid>
 
       {error && (
         <Typography color="error" align="center" sx={{ mb: 2 }}>
