@@ -45,20 +45,20 @@ const columns = [
 const Footer = () => (
   <Box component="footer" sx={{ mt: 8 }}>
     {/* Top section: links/columns */}
-    <Box sx={{ background: 'linear-gradient(180deg, #181c24 0%, #474d58 100%)', color: '#fff', py: 6 }}>
+    <Box sx={{ background: 'linear-gradient(180deg, #181c24 0%, #474d58 100%)', color: '#fff', py: 6, px: { xs: 2, sm: 0 } }}>
       <Container maxWidth="lg">
-        <Grid container spacing={4} alignItems="flex-start" justifyContent={{ xs: 'center', md: 'space-between' }}>
-          {columns.map((col) => (
-            <Grid item xs={12} sm={6} md={3} key={col.title} sx={{ px: { xs: 2, sm: 3, md: 2 } }}>
+        <Grid container spacing={{ xs: 2, sm: 4 }} alignItems="flex-start" justifyContent={{ xs: 'center', md: 'space-between' }}>
+          {columns.map((col, idx) => (
+            <Grid item xs={12} sm={6} md={3} key={col.title} sx={{ px: { xs: 1, sm: 3, md: 2 }, mt: { xs: idx === 0 ? 2 : 0, sm: 0 }, textAlign: { xs: 'center', md: 'left' } }}>
               <Typography
                 variant="subtitle1"
                 fontWeight={700}
-                sx={{ mb: 2, letterSpacing: 1, textAlign: 'left' }}
+                sx={{ mb: 2, letterSpacing: 1 }}
               >
                 {col.title}
               </Typography>
               {col.links.map((link) => (
-                <Box key={link.label} sx={{ mb: 1, textAlign: 'left' }}>
+                <Box key={link.label} sx={{ mb: 1 }}>
                   <Link
                     href={link.href}
                     underline="hover"

@@ -176,7 +176,7 @@ const Header = ({ forceWhite, onToggleSidebar }) => {
   return (
     <StyledAppBar position="static" scrolled={effectiveScrolled ? 1 : 0} elevation={0}>
       <Toolbar sx={{ minHeight: 64, px: { xs: 1, sm: 3 } }}>
-        <BrandTypography onClick={() => navigate('/')} scrolled={effectiveScrolled ? 1 : 0}>
+        <BrandTypography onClick={() => navigate('/')} scrolled={effectiveScrolled ? 1 : 0} sx={{ pl: { xs: 2, sm: 4 } }}>
           Population Forecast Of Malawi
         </BrandTypography>
         <Box sx={{ flexGrow: 1 }} />
