@@ -102,6 +102,7 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
     TimelineIcon: <TimelineIcon />,
     TrendingUpIcon: <TrendingUpIcon />,
   };
+  const { user } = useUser();
 
   const chartOptions = {
     responsive: true,
@@ -180,11 +181,20 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
       {/* Welcome message instead of charts */}
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 220 }}>
         <Paper elevation={2} sx={{ borderRadius: 4, p: { xs: 3, md: 5 }, maxWidth: 600, width: '100%', textAlign: 'center', background: 'linear-gradient(120deg, #f5f7fa 0%, #e3eafc 100%)' }}>
-          <Typography variant="h5" fontWeight={700} sx={{ mb: 2, color: 'primary.main' }}>
-            Welcome to your dashboard!
+          <Typography variant="h5" fontWeight={800} sx={{ mb: 2, color: 'primary.main', letterSpacing: 1 }}>
+            {user?.name ? (
+              <>
+                Welcome, <Box component="span" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #257a5a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 900 }}>{user.name.split(' ')[0]}</Box>!
+              </>
+            ) : (
+              'Welcome!'
+            )}
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Explore the latest population insights and forecasts for Malawi. Use the sidebar to navigate to detailed analytics, reports, and more.
+          <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '1.08rem', md: '1.15rem' }, mb: 2 }}>
+            Your personalized dashboard is ready. Dive into the latest population insights, forecasts, and trends for Malawi—all in one place.
+          </Typography>
+          <Typography variant="subtitle1" sx={{ color: 'primary.dark', fontWeight: 600, fontStyle: 'italic', letterSpacing: 0.5 }}>
+            Empowering your decisions, one data point at a time.
           </Typography>
         </Paper>
       </Box>
