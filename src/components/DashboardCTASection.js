@@ -11,7 +11,7 @@ const DashboardCTASection = () => {
     <Box
       sx={{
         my: 8,
-        minHeight: 380,
+        minHeight: 320,
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
@@ -19,30 +19,28 @@ const DashboardCTASection = () => {
         px: { xs: 2, md: 6 },
       }}
     >
-      {/* Glassmorphism card */}
       <Box
         sx={{
           position: 'relative',
           zIndex: 3,
-          maxWidth: 540,
+          maxWidth: 440,
           width: '100%',
           mx: 'auto',
-          px: { xs: 2, sm: 5 },
-          py: { xs: 3, sm: 7 },
+          px: { xs: 2, sm: 4 },
+          py: { xs: 3, sm: 6 },
           borderRadius: 5,
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-          backdropFilter: 'blur(12px) saturate(160%)',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.13)',
+          backdropFilter: 'blur(10px) saturate(140%)',
           background: 'linear-gradient(135deg, #f8fafc 0%, #f3f7fa 100%)',
-          border: '1.5px solid rgba(255,255,255,0.18)',
+          border: '1.5px solid rgba(255,255,255,0.13)',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
         }}
       >
-        <InsertChartIcon sx={{ fontSize: 32, color: 'primary.main', mb: 1, animation: 'pulse 1.6s infinite alternate' }} />
         <Typography
-          variant="h5"
+          variant="h4"
           fontWeight={800}
           mb={1.5}
           sx={{
@@ -51,25 +49,25 @@ const DashboardCTASection = () => {
             WebkitTextFillColor: 'transparent',
             color: '#257a5a',
             letterSpacing: 1,
-            textShadow: '0 2px 8px rgba(24,28,36,0.18)',
-            fontSize: { xs: '1.15rem', sm: '1.5rem', md: '2.2rem' },
+            textShadow: '0 2px 8px rgba(24,28,36,0.13)',
+            fontSize: { xs: '1.15rem', sm: '1.5rem', md: '2rem' },
           }}
         >
-          Ready to Forecast the Future?
+          Ready to Explore?
         </Typography>
         <Typography
-          variant="body2"
-          sx={{ mb: 2, color: '#333', fontSize: { xs: '0.95rem', sm: '1.05rem' } }}
+          variant="body1"
+          sx={{ mb: 2, color: '#333', fontSize: { xs: '1rem', sm: '1.08rem' } }}
         >
-          Dive into our interactive dashboard to explore trends and forecast Malawi's population growth.
+          Jump into the dashboard and see Malawi’s population trends in action.
         </Typography>
         <Button
           variant="contained"
           size="large"
           sx={{
             mt: 2,
-            px: 3,
-            py: 1.2,
+            px: 4,
+            py: 1.3,
             fontSize: { xs: '1rem', sm: '1.1rem' },
             borderRadius: 3,
             fontWeight: 700,
@@ -83,7 +81,7 @@ const DashboardCTASection = () => {
           startIcon={<InsertChartIcon />}
           onClick={() => navigate('/dashboard')}
         >
-          Explore the Dashboard
+          Go to Dashboard
         </Button>
       </Box>
     </Box>
