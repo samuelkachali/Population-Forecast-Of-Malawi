@@ -322,33 +322,39 @@ const Reports = () => {
                 <Box sx={{ mt: 3, p: 2, background: '#f5f7fa', borderRadius: 3 }}>
                   {reportPreviews[selected]}
                   {/* Only enable download if data exists, otherwise show a message */}
-                  {['forecasts', 'growth', 'health', 'historical'].includes(selected) ? (
-                    hasData[selected] ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 2 }}
-                        disabled={loading}
-                        onClick={() => handleDownload(selected)}
-                      >
-                        {loading ? 'Generating PDF...' : 'Download PDF'}
-                      </Button>
-                    ) : (
-                      <Typography color="warning.main" sx={{ mt: 2 }}>
-                        Please generate data in the {reportCategories.find(c => c.key === selected).title} page first.
-                      </Typography>
-                    )
-                  ) : (
-                        <Button
+                  {selected === 'demographics' && (
+                    <Button
                       variant="contained"
                       color="primary"
                       sx={{ mt: 2 }}
-                      disabled={!demographicsData || !regionalData}
+                      disabled={!demographicsData}
                       onClick={() => handleDownload(selected)}
                     >
                       {loading ? 'Generating PDF...' : 'Download PDF'}
-                        </Button>
-                      )}
+                    </Button>
+                  )}
+                  {selected === 'regional' && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                      disabled={!regionalData}
+                      onClick={() => handleDownload(selected)}
+                    >
+                      {loading ? 'Generating PDF...' : 'Download PDF'}
+                    </Button>
+                  )}
+                  {!['demographics', 'regional'].includes(selected) && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                      disabled={loading}
+                      onClick={() => handleDownload(selected)}
+                    >
+                      {loading ? 'Generating PDF...' : 'Download PDF'}
+                    </Button>
+                  )}
                   {error && (
                     <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
                   )}
