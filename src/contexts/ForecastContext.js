@@ -53,4 +53,11 @@ export const ForecastProvider = ({ children }) => {
   );
 };
 
-export const useForecast = () => useContext(ForecastContext); 
+export const useForecast = () => useContext(ForecastContext);
+
+export const clearForecastData = () => {
+  localStorage.removeItem(REGRESSORS_KEY);
+  localStorage.removeItem(PREDICTIONS_KEY);
+  localStorage.removeItem(REGRESSORS_CHART_KEY);
+  localStorage.removeItem(POPULATION_CHART_KEY);
+}; 

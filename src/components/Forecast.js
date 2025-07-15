@@ -30,7 +30,7 @@ import {
 } from 'chart.js';
 import Snackbar from '@mui/material/Snackbar';
 import { useNotification } from '../contexts/NotificationContext';
-import { useForecast } from '../contexts/ForecastContext';
+import { useForecast, clearForecastData } from '../contexts/ForecastContext';
 
 ChartJS.register(
   CategoryScale,
@@ -184,6 +184,16 @@ export default function Forecast() {
     }
   };
 
+  const handleResetForecast = () => {
+    clearForecastData();
+    setRegressorsData(null);
+    setPopulationData(null);
+    setRegressors(null);
+    setPredictions(null);
+    setRegressorsChartImage(null);
+    setPopulationChartImage(null);
+  };
+
   // Chart data for regressors
   const regressorsChartData = useMemo(() => {
     if (!Array.isArray(regressorsData) || regressorsData.length === 0) return null;
@@ -247,6 +257,11 @@ export default function Forecast() {
       <Typography variant="h4" gutterBottom align="center" sx={{ mb: 3 }}>
             Population Forecast
           </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button variant="outlined" color="error" onClick={handleResetForecast}>
+          Reset Forecast
+        </Button>
+      </Box>
 
       <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mb: 3 }}>
         <Grid item xs={6} sm={3}>

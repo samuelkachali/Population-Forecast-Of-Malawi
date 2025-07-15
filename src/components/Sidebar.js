@@ -10,6 +10,8 @@ import {
   DataUsage, BarChart, People, Logout, Search, ShoppingBag
 } from '@mui/icons-material';
 import { useUser } from '../contexts/UserContext';
+import { clearForecastData } from '../contexts/ForecastContext';
+import { useForecast } from '../contexts/ForecastContext';
 
 const drawerWidth = 300;
 
@@ -64,6 +66,7 @@ const Sidebar = ({ open, onToggle }) => {
   const location = useLocation();
   const [darkMode, setDarkMode] = useState(false);
   const { setUser, user } = useUser();
+  const { setRegressors, setPredictions, setRegressorsChartImage, setPopulationChartImage } = useForecast();
 
   const renderMenu = () => (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', pt: 5, backgroundColor: '#fff', fontFamily: '"Poppins", "Montserrat", "Inter", Arial, sans-serif' }}>
@@ -134,6 +137,11 @@ const Sidebar = ({ open, onToggle }) => {
                 if (item.isLogout) {
                   localStorage.removeItem('user');
                   localStorage.removeItem('token');
+                  clearForecastData();
+                  setRegressors(null);
+                  setPredictions(null);
+                  setRegressorsChartImage(null);
+                  setPopulationChartImage(null);
                   setUser(null);
                   navigate('/signin');
                 } else navigate(item.path);
