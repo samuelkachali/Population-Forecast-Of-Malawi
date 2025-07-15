@@ -161,4 +161,31 @@ router.delete('/profile', protect, async (req, res) => {
   }
 });
 
+// @desc    Deactivate a user (set status to 'Inactive')
+// @route   PATCH /api/users/:id/deactivate
+// @access  Private/Admin
+router.patch('/:id/deactivate', protect, admin, async (req, res) => {
+  const userIdToDeactivate = req.params.id;
+  const requestingUserId = req.user.id;
+
+  // Prevent admin from deactivating themselves
+  if (userIdToDeactivate == requestingUserId) {
+    return res.status(400).json({ message: 'You cannot deactivate your own account.' });
+  }
+
+  try {
+    const result = await db.query(
+      "UPDATE users SET status = 'Inactive' WHERE id = $1 RETURNING id, username, email, status",
+      [userIdToDeactivate]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    res.json({ message: 'User deactivated successfully.', user: result.rows[0] });
+  } catch (error) {
+    console.error('Error deactivating user:', error);
+    res.status(500).json({ message: 'Server error deactivating user.' });
+  }
+});
+
 module.exports = router; 

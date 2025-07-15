@@ -34,6 +34,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import EditIcon from '@mui/icons-material/Edit';
 import PeopleIcon from '@mui/icons-material/People';
 import SearchIcon from '@mui/icons-material/Search';
+import BlockIcon from '@mui/icons-material/Block';
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   borderRadius: '8px',
@@ -164,13 +165,13 @@ const UserManagement = () => {
     }
   };
 
-  const handleDelete = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+  const handleDeactivate = async (userId) => {
+    if (window.confirm('Are you sure you want to deactivate this user?')) {
       const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
-      const result = await handleApiCall(`${API_BASE_URL}/api/users/${userId}`, { method: 'DELETE' });
+      const result = await handleApiCall(`${API_BASE_URL}/api/users/${userId}/deactivate`, { method: 'PATCH' });
       if (result) {
-        setUsers(users.filter((user) => user.id !== userId));
-        setFilteredUsers(filteredUsers.filter((user) => user.id !== userId));
+        setUsers(users.map((user) => user.id === userId ? { ...user, status: 'Inactive' } : user));
+        setFilteredUsers(filteredUsers.map((user) => user.id === userId ? { ...user, status: 'Inactive' } : user));
       }
     }
   };
@@ -394,18 +395,18 @@ const UserManagement = () => {
                               >
                                 <EditIcon />
                               </IconButton>
-                              {user.role !== 'admin' && (
+                              {user.role !== 'admin' && user.status !== 'Inactive' && (
                                 <IconButton 
                                   size="small" 
-                                  onClick={() => handleDelete(user.id)}
-                                  color="error"
+                                  onClick={() => handleDeactivate(user.id)}
+                                  color="warning"
                                   sx={{ 
                                     '& .MuiSvgIcon-root': {
                                       fontSize: { xs: 16, md: 20 }
                                     }
                                   }}
                                 >
-                                  <DeleteIcon />
+                                  <BlockIcon />
                                 </IconButton>
                               )}
                             </Box>

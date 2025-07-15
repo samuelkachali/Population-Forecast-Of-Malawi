@@ -157,32 +157,6 @@ const Settings = ({ user, setUser }) => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    setDeleteDialogOpen(false);
-    setLoading(true);
-    setSuccess('');
-    setError('');
-    try {
-      const token = localStorage.getItem('token');
-      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
-      const res = await fetch(`${API_BASE_URL}/api/user/profile`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) throw new Error('Failed to delete account');
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      setUser(null);
-      navigate('/signin');
-    } catch (err) {
-      setError(err.message || 'Error deleting account');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSignOut = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -361,14 +335,6 @@ const Settings = ({ user, setUser }) => {
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
                     <Button 
-                      variant="outlined" 
-                      color="error" 
-                      onClick={() => setDeleteDialogOpen(true)}
-                      fullWidth={false}
-                    >
-                      Delete Account
-                    </Button>
-                    <Button 
                       variant="contained" 
                       color="secondary" 
                       onClick={handleSignOut}
@@ -381,22 +347,6 @@ const Settings = ({ user, setUser }) => {
               </Card>
             </Grid>
           </Grid>
-          <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-            <DialogTitle>Delete Account</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Are you sure you want to delete your account? This action cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleDeleteAccount} color="error" variant="contained" autoFocus disabled={loading}>
-                {loading ? <CircularProgress size={20} /> : 'Delete'}
-              </Button>
-            </DialogActions>
-          </Dialog>
         </Box>
       </Fade>
     </Box>
