@@ -14,6 +14,54 @@ const Settings = ({ user, setUser }) => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState("");
+  const [passwordChangeError, setPasswordChangeError] = useState("");
+
+  function validateStrongPassword(pw) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
+  }
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordChangeSuccess("");
+    setPasswordChangeError("");
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordChangeError("All fields are required.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordChangeError("New passwords do not match.");
+      return;
+    }
+    if (!validateStrongPassword(newPassword)) {
+      setPasswordChangeError("Password must be at least 8 characters, include uppercase, lowercase, number, and special character.");
+      return;
+    }
+    setPasswordChangeLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+      const res = await fetch(`${API_BASE_URL}/api/user/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      if (!res.ok) throw new Error('Failed to change password');
+      setPasswordChangeSuccess('Password changed successfully!');
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (err) {
+      setPasswordChangeError(err.message || 'Error changing password');
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
   const navigate = useNavigate();
   const { setTheme: setGlobalTheme } = useThemeContext();
 
@@ -238,6 +286,57 @@ const Settings = ({ user, setUser }) => {
                   </Button>
                   {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
                   {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+                </CardContent>
+              </Card>
+            </Grid>
+            {/* Change Password Section */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ borderRadius: { xs: 3, md: 5 }, mb: { xs: 2, md: 3 } }}>
+                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                  <Typography variant="subtitle1" fontWeight={700} mb={2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                    Change Password
+                  </Typography>
+                  <form onSubmit={handleChangePassword}>
+                    <TextField
+                      label="Current Password"
+                      type="password"
+                      value={currentPassword}
+                      onChange={e => setCurrentPassword(e.target.value)}
+                      fullWidth
+                      margin="normal"
+                      size="small"
+                    />
+                    <TextField
+                      label="New Password"
+                      type="password"
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      fullWidth
+                      margin="normal"
+                      size="small"
+                    />
+                    <TextField
+                      label="Confirm New Password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      fullWidth
+                      margin="normal"
+                      size="small"
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                      type="submit"
+                      disabled={passwordChangeLoading}
+                      fullWidth
+                    >
+                      {passwordChangeLoading ? <CircularProgress size={24} /> : 'Change Password'}
+                    </Button>
+                    {passwordChangeSuccess && <Alert severity="success" sx={{ mt: 2 }}>{passwordChangeSuccess}</Alert>}
+                    {passwordChangeError && <Alert severity="error" sx={{ mt: 2 }}>{passwordChangeError}</Alert>}
+                  </form>
                 </CardContent>
               </Card>
             </Grid>

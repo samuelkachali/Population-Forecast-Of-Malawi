@@ -3,6 +3,7 @@ const router = express.Router();
 const cors = require('cors');
 const db = require('../db');
 const { protect, admin } = require('../middleware/auth');
+const bcrypt = require('bcryptjs');
 
 // Handle CORS preflight for all /api/users endpoints
 router.options('/', cors());
@@ -69,6 +70,38 @@ router.put('/:id/make-admin', protect, admin, async (req, res) => {
   } catch (error) {
     console.error('Error promoting user:', error);
     res.status(500).json({ message: 'Server error promoting user.' });
+  }
+});
+
+// Change password endpoint
+router.post('/change-password', protect, async (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Current and new password are required.' });
+  }
+  // Enforce strong password
+  const strongPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(newPassword);
+  if (!strongPw) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.' });
+  }
+  try {
+    const result = await db.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+    if (!result.rows.length) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect.' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const newHash = await bcrypt.hash(newPassword, salt);
+    await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, userId]);
+    res.json({ message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ message: 'Server error changing password.' });
   }
 });
 
