@@ -236,9 +236,9 @@ const Reports = () => {
   // Helper to check if data exists for each report type
   const hasData = {
     forecasts: regressors && predictions && regressors.length > 0 && predictions.length > 0,
-    growth: growthData && growthData.labels && growthData.datasets,
-    health: healthData && healthData.labels && healthData.datasets,
-    historical: populationTrend && populationTrend.labels && populationTrend.datasets,
+    growth: growthData && Array.isArray(growthData.labels) && growthData.labels.length > 0 && Array.isArray(growthData.datasets) && growthData.datasets.length > 0,
+    health: healthData && Array.isArray(healthData.labels) && healthData.labels.length > 0 && Array.isArray(healthData.datasets) && healthData.datasets.length > 0,
+    historical: populationTrend && Array.isArray(populationTrend.labels) && populationTrend.labels.length > 0 && Array.isArray(populationTrend.datasets) && populationTrend.datasets.length > 0,
   };
 
   return (
