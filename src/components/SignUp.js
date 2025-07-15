@@ -80,7 +80,7 @@ const SignUp = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/dashboard');
+        navigate('/signin');
       } else {
         setError(data.message || 'An error occurred during sign up.');
       }
