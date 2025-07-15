@@ -5,6 +5,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
+import { useGrowth } from '../contexts/GrowthContext';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
 const chartOptions = {
@@ -34,11 +35,32 @@ const mockGrowthData = {
   ],
 };
 
-const GrowthAnalysis = ({ growthData }) => {
+const GrowthAnalysis = () => {
   const chartRef = useRef(null);
   const [reportStatus, setReportStatus] = useState({ open: false, message: '', error: false });
-  const data = (growthData && growthData.labels && growthData.datasets) ? growthData : mockGrowthData;
-  const explanation = `The Growth Analysis section visualizes Malawi's annual population growth rate using the latest data from the World Bank.\n\n- The growth rate is the percentage change in population from one year to the next.\n- This metric helps identify periods of rapid or slow population change, which is vital for planning in health, education, and infrastructure.\n- The chart displays the most recent years with available data.\n\nA steady or rising growth rate can indicate a young, expanding population, while a declining rate may signal demographic transition or the impact of health and social policies.`;
+
+  const { growthData, setGrowthData, explanation, setExplanation } = useGrowth();
+
+  // Use context value as initial state
+  const [data, setData] = useState(growthData || {
+    labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+    datasets: [
+      {
+        label: 'Growth Rate (%)',
+        data: [2.7, 2.6, 2.5, 2.6, 2.7, 2.8],
+        backgroundColor: '#00ab55',
+        borderRadius: 8,
+        barPercentage: 0.6,
+      },
+    ],
+    yearRange: '2018-2023',
+  });
+
+  // Keep context in sync with local state
+  React.useEffect(() => { setGrowthData(data); }, [data, setGrowthData]);
+  React.useEffect(() => { setExplanation(explanationText); }, []);
+
+  const explanationText = `The Growth Analysis section visualizes Malawi's annual population growth rate using the latest data from the World Bank.\n\n- The growth rate is the percentage change in population from one year to the next.\n- This metric helps identify periods of rapid or slow population change, which is vital for planning in health, education, and infrastructure.\n- The chart displays the most recent years with available data.\n\nA steady or rising growth rate can indicate a young, expanding population, while a declining rate may signal demographic transition or the impact of health and social policies.`;
 
   // Simple animated background component
   const AnimatedBackground = () => (

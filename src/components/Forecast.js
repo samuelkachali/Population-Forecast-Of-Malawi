@@ -30,6 +30,7 @@ import {
 } from 'chart.js';
 import Snackbar from '@mui/material/Snackbar';
 import { useNotification } from '../contexts/NotificationContext';
+import { useForecast } from '../contexts/ForecastContext';
 
 ChartJS.register(
   CategoryScale,
@@ -46,9 +47,22 @@ export default function Forecast() {
   const [forecastEnd, setForecastEnd] = useState(2027);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [regressorsData, setRegressorsData] = useState(null);
-  const [populationData, setPopulationData] = useState(null);
   const [reportStatus, setReportStatus] = useState({ open: false, message: '', error: false });
+
+  const {
+    regressors, setRegressors,
+    predictions, setPredictions,
+    regressorsChartImage, setRegressorsChartImage,
+    populationChartImage, setPopulationChartImage
+  } = useForecast();
+
+  // Use context values as initial state
+  const [regressorsData, setRegressorsData] = useState(regressors);
+  const [populationData, setPopulationData] = useState(predictions);
+
+  // Keep context in sync with local state
+  React.useEffect(() => { setRegressors(regressorsData); }, [regressorsData, setRegressors]);
+  React.useEffect(() => { setPredictions(populationData); }, [populationData, setPredictions]);
 
   const yearsArray = useMemo(() => {
     const years = [];
@@ -77,7 +91,7 @@ export default function Forecast() {
       if (!response.ok) throw new Error('Failed to fetch regressors');
       const data = await response.json();
       if (Array.isArray(data)) {
-      setRegressorsData(data);
+        setRegressorsData(data);
       } else {
         setRegressorsData(null);
         setError('Backend returned invalid regressors data.');
@@ -129,6 +143,18 @@ export default function Forecast() {
 
   const regressorsChartRef = useRef(null);
   const populationChartRef = useRef(null);
+
+  // Store chart images in context when available
+  React.useEffect(() => {
+    if (regressorsChartRef.current && regressorsChartRef.current.canvas) {
+      setRegressorsChartImage(regressorsChartRef.current.canvas.toDataURL('image/png'));
+    }
+  }, [regressorsChartRef, regressorsData, setRegressorsChartImage]);
+  React.useEffect(() => {
+    if (populationChartRef.current && populationChartRef.current.canvas) {
+      setPopulationChartImage(populationChartRef.current.canvas.toDataURL('image/png'));
+    }
+  }, [populationChartRef, populationData, setPopulationChartImage]);
 
   const handleGenerateReport = async () => {
     let regressorsChartImage = null;

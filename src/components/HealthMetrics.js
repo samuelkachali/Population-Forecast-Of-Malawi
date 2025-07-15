@@ -4,6 +4,7 @@ import { Bar } from 'react-chartjs-2';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import Snackbar from '@mui/material/Snackbar';
+import { useHealth } from '../contexts/HealthContext';
 
 const chartOptions = {
   responsive: true,
@@ -31,12 +32,31 @@ const mockHealthData = {
   ],
 };
 
-const HealthMetrics = ({ healthData }) => {
-  const data = healthData && Array.isArray(healthData.datasets) ? healthData : mockHealthData;
+const HealthMetrics = () => {
+  const { healthData, setHealthData, explanation, setExplanation } = useHealth();
+
+  // Use context value as initial state
+  const [data, setData] = useState(healthData || {
+    labels: ['Life Expectancy', 'Infant Mortality', 'Access to Healthcare'],
+    datasets: [
+      {
+        label: 'Value',
+        data: [65, 38, 62],
+        backgroundColor: ['#00ab55', '#ff5630', '#3366FF'],
+        borderRadius: 8,
+      },
+    ],
+    year: 2023,
+  });
+
+  // Keep context in sync with local state
+  React.useEffect(() => { setHealthData(data); }, [data, setHealthData]);
+  React.useEffect(() => { setExplanation(explanationText); }, []);
+
   const chartRef = useRef(null);
   const [reportStatus, setReportStatus] = useState({ open: false, message: '', error: false });
 
-  const explanation = `The Health Metrics section provides a visual summary of key health indicators for Malawi, using the most recent authoritative data available from the World Bank. The metrics included are:\n\n1. Life Expectancy: The average number of years a newborn is expected to live, assuming current mortality rates remain constant throughout their life. (Unit: Years)\n2. Infant Mortality: The number of deaths of infants under one year old per 1,000 live births. (Unit: Deaths per 1,000 live births)\n3. Access to Basic Sanitation (%): The percentage of the population using at least basic sanitation services, such as improved sanitation facilities that are not shared with other households. (Unit: Percent)\n\nHow the Data is Fetched and Displayed:\n- The dashboard fetches the latest available data for each metric from the World Bank API.\n- If the most recent year’s data is missing, the system automatically uses the most recent year with valid data for each indicator.\n- The data is displayed in a bar chart, with each metric clearly labeled and the year of the data shown for transparency.\n\nWhy These Metrics Matter:\nThese health indicators are essential for understanding the population’s well-being and the effectiveness of public health interventions. Improvements in life expectancy and access to sanitation, and reductions in infant mortality, are key signs of progress in health and development.`;
+  const explanationText = `The Health Metrics section provides a visual summary of key health indicators for Malawi, using the most recent authoritative data available from the World Bank. The metrics included are:\n\n1. Life Expectancy: The average number of years a newborn is expected to live, assuming current mortality rates remain constant throughout their life. (Unit: Years)\n2. Infant Mortality: The number of deaths of infants under one year old per 1,000 live births. (Unit: Deaths per 1,000 live births)\n3. Access to Basic Sanitation (%): The percentage of the population using at least basic sanitation services, such as improved sanitation facilities that are not shared with other households. (Unit: Percent)\n\nHow the Data is Fetched and Displayed:\n- The dashboard fetches the latest available data for each metric from the World Bank API.\n- If the most recent year’s data is missing, the system automatically uses the most recent year with valid data for each indicator.\n- The data is displayed in a bar chart, with each metric clearly labeled and the year of the data shown for transparency.\n\nWhy These Metrics Matter:\nThese health indicators are essential for understanding the population’s well-being and the effectiveness of public health interventions. Improvements in life expectancy and access to sanitation, and reductions in infant mortality, are key signs of progress in health and development.`;
 
   const handleGenerateReport = async () => {
     let chartImage = null;

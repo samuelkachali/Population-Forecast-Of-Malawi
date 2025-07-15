@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { styled } from '@mui/material/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import TablePagination from '@mui/material/TablePagination';
+import { useHistorical } from '../contexts/HistoricalContext';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, Legend);
 
 const chartOptions = {
@@ -77,11 +78,31 @@ const ValueCell = styled(TableCell)(({ theme, diff }) => ({
   fontSize: '1rem',
 }));
 
-const HistoricalTrend = ({ populationTrend, loading, error }) => {
-  const hasData = populationTrend && Array.isArray(populationTrend.labels) && populationTrend.labels.length > 0 && Array.isArray(populationTrend.datasets) && populationTrend.datasets.length > 0;
+const HistoricalTrend = () => {
+  const { populationTrend, setPopulationTrend, explanation, setExplanation } = useHistorical();
+
+  // Use context value as initial state
+  const [trend, setTrend] = useState(populationTrend || {
+    labels: ['2000', '2005', '2010', '2015', '2020', '2023'],
+    datasets: [
+      {
+        label: 'Population (Millions)',
+        data: [11.6, 13.1, 14.9, 16.8, 19.1, 20.5],
+        borderColor: '#3366FF',
+        backgroundColor: 'rgba(51,102,255,0.08)',
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  });
+
+  // Keep context in sync with local state
+  React.useEffect(() => { setPopulationTrend(trend); }, [trend, setPopulationTrend]);
+  React.useEffect(() => { setExplanation(explanationText); }, []);
+
+  const explanationText = `The Historical Population Trend chart visualizes Malawi's population changes over time using the latest available data from the World Bank.\n\n- The chart shows the total population for each year, highlighting periods of rapid growth or demographic shifts.\n- Understanding these trends is crucial for policy, planning, and anticipating future needs in areas like health, education, and infrastructure.\n- The data is sourced from the World Bank and reflects the most recent historical records.\n\nA steady upward trend indicates sustained population growth, while plateaus or dips may signal demographic transitions or the impact of external events.`;
   const chartRef = useRef(null);
   const [reportStatus, setReportStatus] = useState({ open: false, message: '', error: false });
-  const explanation = `The Historical Population Trend chart visualizes Malawi's population changes over time using the latest available data from the World Bank.\n\n- The chart shows the total population for each year, highlighting periods of rapid growth or demographic shifts.\n- Understanding these trends is crucial for policy, planning, and anticipating future needs in areas like health, education, and infrastructure.\n- The data is sourced from the World Bank and reflects the most recent historical records.\n\nA steady upward trend indicates sustained population growth, while plateaus or dips may signal demographic transitions or the impact of external events.`;
   const [showPredictions, setShowPredictions] = useState(false);
   const [predLoading, setPredLoading] = useState(false);
   const [predError, setPredError] = useState(null);
@@ -101,9 +122,9 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          populationTrend,
+          populationTrend: trend,
           chartImage,
-          explanation,
+          explanation: explanationText,
           reportType: 'historical-trend',
         }),
       });
@@ -217,12 +238,9 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
             }}>
               <CardContent>
                 <Box sx={{ height: { xs: 200, sm: 260, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : error ? (
-                    <Typography color="error" variant="h6">{error}</Typography>
-                  ) : hasData ? (
-                    <Line data={populationTrend} options={chartOptions} ref={chartRef} />
+                  {/* Removed loading and error states as they are handled by context */}
+                  {trend && Array.isArray(trend.labels) && trend.labels.length > 0 && Array.isArray(trend.datasets) && trend.datasets.length > 0 ? (
+                    <Line data={trend} options={chartOptions} ref={chartRef} />
                   ) : (
                     <Line data={mockTrend} options={chartOptions} />
                   )}
@@ -231,7 +249,7 @@ const HistoricalTrend = ({ populationTrend, loading, error }) => {
             </Card>
           </Fade>
           {/* Generate Report Button - only if real populationTrend data is available */}
-          {hasData && (
+          {trend && Array.isArray(trend.labels) && trend.labels.length > 0 && Array.isArray(trend.datasets) && trend.datasets.length > 0 && (
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               {/* Removed Generate Report button */}
               <Button

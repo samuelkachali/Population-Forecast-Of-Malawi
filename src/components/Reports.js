@@ -7,6 +7,10 @@ import MapIcon from '@mui/icons-material/Map';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import Snackbar from '@mui/material/Snackbar';
+import { useForecast } from '../contexts/ForecastContext';
+import { useGrowth } from '../contexts/GrowthContext';
+import { useHealth } from '../contexts/HealthContext';
+import { useHistorical } from '../contexts/HistoricalContext';
 
 const reportCategories = [
   {
@@ -141,6 +145,11 @@ const Reports = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', error: false });
   const [lastReport, setLastReport] = useState(null);
 
+  const { regressors, predictions, regressorsChartImage, populationChartImage } = useForecast();
+  const { growthData, explanation: growthExplanation } = useGrowth();
+  const { healthData, explanation: healthExplanation } = useHealth();
+  const { populationTrend, explanation: historicalExplanation } = useHistorical();
+
   // Helper to download a file from a URL
   const downloadFile = (url, filename) => {
     const link = document.createElement('a');
@@ -161,31 +170,31 @@ const Reports = () => {
       let explanation = '';
       if (type === 'forecasts') {
         payload = {
-          regressors: mockForecastRegressors,
-          predictions: mockForecastPredictions,
-          regressorsChartImage: undefined,
-          populationChartImage: undefined,
+          regressors,
+          predictions,
+          regressorsChartImage,
+          populationChartImage,
         };
         filename = 'forecast_report.pdf';
         explanation = 'This report provides a forecast of Malawi\'s population based on recent trends and predictive modeling.';
       } else if (type === 'growth') {
         payload = {
-          growthData: mockGrowthData,
+          growthData,
           chartImage: undefined,
-          explanation: 'The Growth Analysis section visualizes Malawi\'s annual population growth rate using the latest data from the World Bank.',
+          explanation: growthExplanation,
           reportType: 'growth-analysis',
         };
         filename = 'growth_analysis_report.pdf';
-        explanation = payload.explanation;
+        explanation = growthExplanation;
       } else if (type === 'health') {
         payload = {
-          healthData: mockHealthData,
+          healthData,
           chartImage: undefined,
-          explanation: 'The Health Metrics section provides a visual summary of key health indicators for Malawi.',
+          explanation: healthExplanation,
           reportType: 'health-metrics',
         };
         filename = 'health_metrics_report.pdf';
-        explanation = payload.explanation;
+        explanation = healthExplanation;
       } else if (type === 'demographics') {
         setSnackbar({ open: true, message: 'Demographics PDF not implemented.', error: true });
         setLoading(false);
@@ -196,13 +205,13 @@ const Reports = () => {
         return;
       } else if (type === 'historical') {
         payload = {
-          populationTrend: mockTrend,
+          populationTrend,
           chartImage: undefined,
-          explanation: 'The Historical Population Trend chart visualizes Malawi\'s population changes over time.',
+          explanation: historicalExplanation,
           reportType: 'historical-trend',
         };
         filename = 'historical_trend_report.pdf';
-        explanation = payload.explanation;
+        explanation = historicalExplanation;
       }
       const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
         method: 'POST',
@@ -222,6 +231,14 @@ const Reports = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to check if data exists for each report type
+  const hasData = {
+    forecasts: regressors && predictions && regressors.length > 0 && predictions.length > 0,
+    growth: growthData && growthData.labels && growthData.datasets,
+    health: healthData && healthData.labels && healthData.datasets,
+    historical: populationTrend && populationTrend.labels && populationTrend.datasets,
   };
 
   return (
@@ -289,15 +306,33 @@ const Reports = () => {
               {selected && (
                 <Box sx={{ mt: 3, p: 2, background: '#f5f7fa', borderRadius: 3 }}>
                   {reportPreviews[selected]}
+                  {/* Only enable download if data exists, otherwise show a message */}
+                  {['forecasts', 'growth', 'health', 'historical'].includes(selected) ? (
+                    hasData[selected] ? (
                       <Button
                         variant="contained"
                         color="primary"
-                    sx={{ mt: 2 }}
-                    disabled={loading}
-                    onClick={() => handleDownload(selected)}
-                  >
-                    {loading ? 'Generating PDF...' : 'Download PDF'}
+                        sx={{ mt: 2 }}
+                        disabled={loading}
+                        onClick={() => handleDownload(selected)}
+                      >
+                        {loading ? 'Generating PDF...' : 'Download PDF'}
                       </Button>
+                    ) : (
+                      <Typography color="warning.main" sx={{ mt: 2 }}>
+                        Please generate data in the {reportCategories.find(c => c.key === selected).title} page first.
+                      </Typography>
+                    )
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                      disabled
+                    >
+                      Not available
+                    </Button>
+                  )}
                   {error && (
                     <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
                   )}
