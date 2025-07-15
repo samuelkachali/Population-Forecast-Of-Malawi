@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, forwardRef } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import {
   Box,
@@ -42,7 +42,8 @@ ChartJS.register(
   Legend
 );
 
-export default function Forecast() {
+const Forecast = forwardRef(function Forecast(props, ref) {
+  const { predictPopRef } = props;
   const [forecastStart, setForecastStart] = useState(2025);
   const [forecastEnd, setForecastEnd] = useState(2027);
   const [loading, setLoading] = useState(false);
@@ -302,7 +303,7 @@ export default function Forecast() {
             onClick={handlePredictRegressors}
             disabled={loading || forecastEnd < forecastStart}
             fullWidth
-            id="forecast-tour"
+            ref={ref}
           >
             {loading ? 'Predicting...' : 'Predict Regressors'}
           </Button>
@@ -313,7 +314,7 @@ export default function Forecast() {
             onClick={handlePredictPopulation}
             disabled={loading || !regressorsData}
             fullWidth
-            id="predict-population-tour"
+            ref={predictPopRef}
           >
             {loading ? 'Predicting...' : 'Predict Population'}
           </Button>
@@ -430,4 +431,5 @@ export default function Forecast() {
       />
     </Box>
   );
-} 
+});
+export default Forecast; 

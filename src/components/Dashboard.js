@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Grid,
@@ -36,6 +36,7 @@ import { useUser } from '../contexts/UserContext';
 import { useGrowth } from '../contexts/GrowthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
+import Popover from '@mui/material/Popover';
 
 const drawerWidth = 300;
 
@@ -242,38 +243,54 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const { setGrowthData } = useGrowth();
-  const [showTour, setShowTour] = useState(false);
+  // Custom Tour State
+  const [tourOpen, setTourOpen] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
+  const sidebarRef = useRef();
+  const forecastRef = useRef();
+  const predictPopRef = useRef();
+  const reportsRef = useRef();
+  const settingsRef = useRef();
   const tourSteps = [
     {
-      selector: '#sidebar-tour',
-      content: 'Navigate between dashboard features here.',
+      ref: sidebarRef,
+      content: 'Navigate between dashboard features here.'
     },
     {
-      selector: '#forecast-tour',
-      content: 'Set your years and click here to predict regressors.',
+      ref: forecastRef,
+      content: 'Set your years and click here to predict regressors.'
     },
     {
-      selector: '#predict-population-tour',
-      content: 'After regressors, click here to predict population.',
+      ref: predictPopRef,
+      content: 'After regressors, click here to predict population.'
     },
     {
-      selector: '#reports-tour',
-      content: 'Download your generated reports here.',
+      ref: reportsRef,
+      content: 'Download your generated reports here.'
     },
     {
-      selector: '#settings-tour',
-      content: 'Update your profile and preferences here.',
-    },
+      ref: settingsRef,
+      content: 'Update your profile and preferences here.'
+    }
   ];
-
   useEffect(() => {
     if (localStorage.getItem('tutorialCompleted') !== 'true') {
-      setShowTour(true);
+      setTourOpen(true);
     }
   }, []);
-
+  const handleTourNext = () => {
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+    } else {
+      setTourOpen(false);
+      localStorage.setItem('tutorialCompleted', 'true');
+    }
+  };
+  const handleTourBack = () => {
+    if (tourStep > 0) setTourStep(tourStep - 1);
+  };
   const handleTourClose = () => {
-    setShowTour(false);
+    setTourOpen(false);
     localStorage.setItem('tutorialCompleted', 'true');
   };
 
@@ -342,7 +359,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
-      <Sidebar open={sidebarOpen} onToggle={handleSidebarToggle} id="sidebar-tour" />
+      <Sidebar open={sidebarOpen} onToggle={handleSidebarToggle} ref={sidebarRef} />
       <Box
         sx={{
           flexGrow: 1,
@@ -363,6 +380,28 @@ const Dashboard = () => {
             minHeight: '100vh',
           }}
         >
+          {/* Custom Guided Tour Popover */}
+          <Popover
+            open={tourOpen}
+            anchorEl={tourSteps[tourStep].ref.current}
+            onClose={handleTourClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+            PaperProps={{ sx: { p: 2, maxWidth: 320, borderRadius: 3, boxShadow: 6 } }}
+            disableAutoFocus
+            disableEnforceFocus
+          >
+            <div style={{ minHeight: 60, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>{tourSteps[tourStep].content}</span>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <Button onClick={handleTourBack} disabled={tourStep === 0}>Back</Button>
+                <Button onClick={handleTourNext} variant="contained" color="primary">
+                  {tourStep === tourSteps.length - 1 ? 'Finish' : 'Next'}
+                </Button>
+                <Button onClick={handleTourClose} color="error">Skip</Button>
+              </div>
+            </div>
+          </Popover>
           {loading ? (
             <Box
               sx={{
@@ -389,7 +428,7 @@ const Dashboard = () => {
                   }
                 />
                 <Route path="overview" element={<PopulationOverview stats={dashboardData?.stats} />} />
-                <Route path="forecast" element={<Forecast id="forecast-tour" />} />
+                <Route path="forecast" element={<Forecast ref={forecastRef} predictPopRef={predictPopRef} />} />
                 <Route path="history" element={<HistoricalTrend populationTrend={dashboardData?.populationTrend} />} />
                 <Route path="growth" element={<GrowthAnalysis growthData={dashboardData?.growthData} />} />
                 <Route path="compare" element={<ComparativeStudies />} />
@@ -400,8 +439,8 @@ const Dashboard = () => {
                 <Route path="health" element={<HealthMetrics healthData={dashboardData?.healthData} />} />
                 <Route path="analytics" element={<Analytics analyticsData={dashboardData?.analyticsData} />} />
                 <Route path="demographics" element={<Demographics demographicsData={dashboardData?.demographicsData} />} />
-                <Route path="reports" element={<Reports id="reports-tour" />} />
-                <Route path="settings" element={<Settings id="settings-tour" />} />
+                <Route path="reports" element={<Reports ref={reportsRef} />} />
+                <Route path="settings" element={<Settings ref={settingsRef} />} />
                 <Route path="user-management" element={<UserManagement />} />
                 <Route path="*" element={<Navigate to="overview" replace />} />
               </Routes>
