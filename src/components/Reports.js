@@ -139,6 +139,7 @@ const Reports = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', error: false });
+  const [lastReport, setLastReport] = useState(null);
 
   // Helper to download a file from a URL
   const downloadFile = (url, filename) => {
@@ -157,15 +158,16 @@ const Reports = () => {
     try {
       let payload = {};
       let filename = '';
+      let explanation = '';
       if (type === 'forecasts') {
-        // In a real app, get the user's actual forecast data from context or state
         payload = {
           regressors: mockForecastRegressors,
           predictions: mockForecastPredictions,
-          regressorsChartImage: undefined, // Could be added if available
-          populationChartImage: undefined, // Could be added if available
+          regressorsChartImage: undefined,
+          populationChartImage: undefined,
         };
         filename = 'forecast_report.pdf';
+        explanation = 'This report provides a forecast of Malawi\'s population based on recent trends and predictive modeling.';
       } else if (type === 'growth') {
         payload = {
           growthData: mockGrowthData,
@@ -174,6 +176,7 @@ const Reports = () => {
           reportType: 'growth-analysis',
         };
         filename = 'growth_analysis_report.pdf';
+        explanation = payload.explanation;
       } else if (type === 'health') {
         payload = {
           healthData: mockHealthData,
@@ -182,8 +185,8 @@ const Reports = () => {
           reportType: 'health-metrics',
         };
         filename = 'health_metrics_report.pdf';
+        explanation = payload.explanation;
       } else if (type === 'demographics') {
-        // No backend support, so just download a static PDF or show a message
         setSnackbar({ open: true, message: 'Demographics PDF not implemented.', error: true });
         setLoading(false);
         return;
@@ -199,6 +202,7 @@ const Reports = () => {
           reportType: 'historical-trend',
         };
         filename = 'historical_trend_report.pdf';
+        explanation = payload.explanation;
       }
       const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
         method: 'POST',
@@ -208,9 +212,10 @@ const Reports = () => {
       if (!response.ok) throw new Error('Failed to generate report');
       const data = await response.json();
       if (!data.url) throw new Error('No PDF URL returned');
-      // Download the PDF
-      downloadFile(`${API_BASE_URL}/api${data.url}`, filename);
+      // Download the PDF (fix: remove /api prefix)
+      downloadFile(`${API_BASE_URL}${data.url}`, filename);
       setSnackbar({ open: true, message: 'Report downloaded!', error: false });
+      setLastReport({ type, explanation });
     } catch (err) {
       setError(err.message || 'Failed to download report');
       setSnackbar({ open: true, message: err.message || 'Failed to download report', error: true });
@@ -284,17 +289,24 @@ const Reports = () => {
               {selected && (
                 <Box sx={{ mt: 3, p: 2, background: '#f5f7fa', borderRadius: 3 }}>
                   {reportPreviews[selected]}
-                  <Button
-                    variant="contained"
-                    color="primary"
+                      <Button
+                        variant="contained"
+                        color="primary"
                     sx={{ mt: 2 }}
                     disabled={loading}
                     onClick={() => handleDownload(selected)}
                   >
                     {loading ? 'Generating PDF...' : 'Download PDF'}
-                  </Button>
+                      </Button>
                   {error && (
                     <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
+                  )}
+                  {/* Show report content and explanation after download */}
+                  {lastReport && lastReport.type === selected && (
+                    <Box sx={{ mt: 3, p: 2, background: '#e3eafc', borderRadius: 2 }}>
+                      <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>Report Explanation</Typography>
+                      <Typography variant="body2">{lastReport.explanation}</Typography>
+                    </Box>
                   )}
                 </Box>
               )}
