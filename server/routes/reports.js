@@ -328,4 +328,15 @@ router.delete('/:filename', (req, res) => {
   res.json({ message: 'Report deleted' });
 });
 
+// Serve train-predictions for Prophet model actual vs predicted
+router.get('/train-predictions', (req, res) => {
+  const filePath = path.join(__dirname, '../utils/data/train_predictions.json');
+  if (fs.existsSync(filePath)) {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    res.json(data);
+  } else {
+    res.status(404).json({ error: 'Training predictions not found' });
+  }
+});
+
 module.exports = router; 
