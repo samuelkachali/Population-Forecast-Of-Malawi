@@ -41,10 +41,30 @@ const SignUp = () => {
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
 
+  const validateStrongPassword = (pw) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
+  const validateEmail = (email) => /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(email);
+  const validateName = (name) => /^[A-Za-z][A-Za-z\s\.'-]+$/.test(name) && name.trim().split(/\s+/).length >= 2 && !/\d/.test(name);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateName(username)) {
+      setError('Please enter your full name (at least two words, no numbers).');
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!validateStrongPassword(password)) {
+      setError('Password must be at least 8 characters, include uppercase, lowercase, number, and special character.');
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      return;
+    }
+    if (!agreeToTerms) {
+      setError('You must agree to the terms and conditions.');
       return;
     }
     setIsLoading(true);

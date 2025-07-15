@@ -12,6 +12,19 @@ router.post('/signup', async (req, res) => {
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Please provide all required fields.' });
   }
+  // Strong validation
+  const strongPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password);
+  const validEmail = /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(email);
+  const validName = /^[A-Za-z][A-Za-z\s\.'-]+$/.test(username) && username.trim().split(/\s+/).length >= 2 && !/\d/.test(username);
+  if (!validName) {
+    return res.status(400).json({ message: 'Please enter your full name (at least two words, no numbers).' });
+  }
+  if (!validEmail) {
+    return res.status(400).json({ message: 'Please enter a valid email address.' });
+  }
+  if (!strongPw) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.' });
+  }
 
   try {
     // Check if any users exist to determine role
