@@ -237,7 +237,7 @@ const DashboardOverview = ({ dashboardData, loading, error, setRefreshKey }) => 
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useUser();
+  const { user } = useUser(); // get current user
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -274,16 +274,16 @@ const Dashboard = () => {
     }
   ];
   useEffect(() => {
-    if (localStorage.getItem('tutorialCompleted') !== 'true') {
+    if (user && localStorage.getItem(`tutorialCompleted_${user.email}`) !== 'true') {
       setTourOpen(true);
     }
-  }, []);
+  }, [user]);
   const handleTourNext = () => {
     if (tourStep < tourSteps.length - 1) {
       setTourStep(tourStep + 1);
     } else {
       setTourOpen(false);
-      localStorage.setItem('tutorialCompleted', 'true');
+      if (user) localStorage.setItem(`tutorialCompleted_${user.email}`, 'true');
     }
   };
   const handleTourBack = () => {
@@ -291,7 +291,7 @@ const Dashboard = () => {
   };
   const handleTourClose = () => {
     setTourOpen(false);
-    localStorage.setItem('tutorialCompleted', 'true');
+    if (user) localStorage.setItem(`tutorialCompleted_${user.email}`, 'true');
   };
 
   const retryFetch = () => {
