@@ -1,11 +1,12 @@
+// Move all imports to the top
 import React, { useState, useEffect, useRef } from 'react';
+import Popover from '@mui/material/Popover';
 import {
   Box,
   Grid,
   Typography,
   Card,
   CardContent,
-  Stack,
   CircularProgress,
   Button,
 } from '@mui/material';
@@ -36,7 +37,6 @@ import { useUser } from '../contexts/UserContext';
 import { useGrowth } from '../contexts/GrowthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
-import Popover from '@mui/material/Popover';
 
 const drawerWidth = 300;
 
