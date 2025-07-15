@@ -88,6 +88,7 @@ const keyDemographics = {
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportsRouter);
 app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/files/reports', (req, res, next) => {
   console.log('Serving file:', req.url);
