@@ -6,6 +6,7 @@ import FeatureCardsSection from './FeatureCardsSection';
 import Footer from './Footer';
 import PopulationChallengesSection from './PopulationChallengesSection';
 import DashboardCTASection from './DashboardCTASection';
+import TestimonialQuoteSection from './TestimonialQuoteSection';
 import { Box, Container, useMediaQuery, useTheme } from '@mui/material';
 
 const Welcome = () => {
@@ -23,6 +24,7 @@ const Welcome = () => {
           {/* Place your releases, challenges, or other main content here */}
         </Container>
       </Box>
+      <TestimonialQuoteSection />
       <DashboardCTASection />
       <Footer />
     </>

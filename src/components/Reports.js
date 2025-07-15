@@ -323,29 +323,29 @@ const Reports = () => {
                   {reportPreviews[selected]}
                   {/* Only enable download if data exists, otherwise show a message */}
                   {selected === 'demographics' && (
-                    <Button
+                      <Button
                       variant="contained"
-                      color="primary"
+                        color="primary"
                       sx={{ mt: 2 }}
                       disabled={!demographicsData}
                       onClick={() => handleDownload(selected)}
                     >
                       {loading ? 'Generating PDF...' : 'Download PDF'}
-                    </Button>
+                      </Button>
                   )}
                   {selected === 'regional' && (
-                    <Button
-                      variant="contained"
-                      color="primary"
+                      <Button
+                        variant="contained"
+                        color="primary"
                       sx={{ mt: 2 }}
                       disabled={!regionalData}
                       onClick={() => handleDownload(selected)}
                     >
                       {loading ? 'Generating PDF...' : 'Download PDF'}
-                    </Button>
+                      </Button>
                   )}
                   {!['demographics', 'regional'].includes(selected) && (
-                    <Button
+                        <Button
                       variant="contained"
                       color="primary"
                       sx={{ mt: 2 }}
@@ -353,8 +353,8 @@ const Reports = () => {
                       onClick={() => handleDownload(selected)}
                     >
                       {loading ? 'Generating PDF...' : 'Download PDF'}
-                    </Button>
-                  )}
+                        </Button>
+                      )}
                   {error && (
                     <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>
                   )}
