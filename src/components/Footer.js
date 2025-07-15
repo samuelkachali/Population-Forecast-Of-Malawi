@@ -49,11 +49,11 @@ const Footer = () => (
       <Container maxWidth="lg">
         <Grid container spacing={{ xs: 2, sm: 4 }} alignItems="flex-start" justifyContent={{ xs: 'center', md: 'space-between' }}>
           {columns.map((col, idx) => (
-            <Grid item xs={12} sm={6} md={3} key={col.title} sx={{ px: { xs: 1, sm: 3, md: 2 }, mt: { xs: idx === 0 ? 2 : 0, sm: 0 }, textAlign: { xs: 'center', md: 'left' } }}>
+            <Grid item xs={12} sm={6} md={3} key={col.title} sx={{ px: { xs: 1, sm: 3, md: 2 }, mt: { xs: idx === 0 ? 2 : 0, sm: 0 }, textAlign: 'left' }}>
               <Typography
                 variant="subtitle1"
                 fontWeight={700}
-                sx={{ mb: 2, letterSpacing: 1 }}
+                sx={{ mb: 2, letterSpacing: 1, fontSize: { xs: '1.08rem', sm: '1.15rem' } }}
               >
                 {col.title}
               </Typography>
@@ -63,7 +63,7 @@ const Footer = () => (
                     href={link.href}
                     underline="hover"
                     color="inherit"
-                    sx={{ opacity: 0.85, fontSize: '1rem', '&:hover': { opacity: 1, color: 'primary.light' } }}
+                    sx={{ opacity: 0.85, fontSize: { xs: '0.98rem', sm: '1rem' }, '&:hover': { opacity: 1, color: 'primary.light' } }}
                   >
                     {link.label}
                   </Link>
