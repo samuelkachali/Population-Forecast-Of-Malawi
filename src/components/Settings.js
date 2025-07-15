@@ -260,20 +260,6 @@ const Settings = ({ user, setUser }) => {
                     margin="normal"
                     size="small"
                   />
-                  <TextField
-                    label="Change Password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={handlePasswordChange}
-                    fullWidth
-                    margin="normal"
-                    size="small"
-                  />
-                  <FormControlLabel
-                    control={<Switch checked={showPassword} onChange={() => setShowPassword((s) => !s)} />}
-                    label="Show Password"
-                    sx={{ mt: 1 }}
-                  />
                   <Button 
                     variant="contained" 
                     color="primary" 

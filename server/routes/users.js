@@ -105,4 +105,60 @@ router.post('/change-password', protect, async (req, res) => {
   }
 });
 
+// Get current user profile
+router.get('/profile', protect, async (req, res) => {
+  try {
+    const result = await db.query('SELECT id, username, email, role, created_at, last_login FROM users WHERE id = $1', [req.user.id]);
+    if (!result.rows.length) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching profile.' });
+  }
+});
+
+// Update current user profile
+router.patch('/profile', protect, async (req, res) => {
+  const { name, email, password } = req.body;
+  try {
+    let updateFields = [];
+    let values = [];
+    let idx = 1;
+    if (name) { updateFields.push(`username = $${idx++}`); values.push(name); }
+    if (email) { updateFields.push(`email = $${idx++}`); values.push(email); }
+    if (password) {
+      // Enforce strong password
+      const strongPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password);
+      if (!strongPw) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.' });
+      }
+      const bcrypt = require('bcryptjs');
+      const salt = await bcrypt.genSalt(10);
+      const password_hash = await bcrypt.hash(password, salt);
+      updateFields.push(`password_hash = $${idx++}`);
+      values.push(password_hash);
+    }
+    if (updateFields.length === 0) {
+      return res.status(400).json({ message: 'No fields to update.' });
+    }
+    values.push(req.user.id);
+    const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${idx} RETURNING id, username, email, role, last_login`;
+    const result = await db.query(updateQuery, values);
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error updating profile.' });
+  }
+});
+
+// Delete current user
+router.delete('/profile', protect, async (req, res) => {
+  try {
+    await db.query('DELETE FROM users WHERE id = $1', [req.user.id]);
+    res.json({ message: 'Account deleted.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error deleting account.' });
+  }
+});
+
 module.exports = router; 
