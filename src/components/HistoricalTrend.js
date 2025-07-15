@@ -150,7 +150,7 @@ const HistoricalTrend = ({ populationTrend: propPopulationTrend }) => {
       setPredLoading(true);
       setPredError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/train-predictions`);
+        const response = await fetch(`${API_BASE_URL}/api/reports/train-predictions`);
         const data = await response.json();
         setTrainData(data);
       } catch (err) {
