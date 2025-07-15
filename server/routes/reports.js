@@ -168,6 +168,80 @@ router.post('/generate', async (req, res) => {
       saveReports(reports);
       return res.json(newReport);
     }
+    // Demographics Report
+    if (req.body.demographicsData) {
+      filename = `demographics_report_${timestamp}.pdf`;
+      filepath = path.join(REPORTS_DIR, filename);
+      doc = new PDFDocument();
+      stream = fs.createWriteStream(filepath);
+      doc.pipe(stream);
+      doc.fontSize(20).text('Demographics Report', { align: 'center' });
+      doc.moveDown();
+      const { gender, pyramid } = req.body.demographicsData;
+      if (gender && gender.year) {
+        doc.fontSize(14).text(`Gender Distribution (Year: ${gender.year})`, { align: 'left' });
+        doc.moveDown();
+        gender.labels.forEach((label, i) => {
+          doc.text(`${label}: ${gender.datasets[0].data[i]}%`);
+        });
+        doc.moveDown();
+      }
+      if (pyramid && pyramid.year) {
+        doc.fontSize(14).text(`Population Pyramid (Year: ${pyramid.year})`, { align: 'left' });
+        doc.moveDown();
+        pyramid.labels.forEach((label, i) => {
+          doc.text(`${label}: Male ${pyramid.datasets[0].data[i]}%, Female ${pyramid.datasets[1].data[i]}%`);
+        });
+        doc.moveDown();
+      }
+      doc.end();
+      await new Promise(resolve => stream.on('finish', resolve));
+      const reports = loadReports();
+      newReport = {
+        title: `Demographics Report (${new Date(timestamp).toLocaleString()})`,
+        summary: 'Custom report of population structure, age groups, and gender distribution.',
+        type: 'pdf',
+        url: `/files/reports/${filename}`,
+        date: new Date(timestamp).toISOString(),
+      };
+      reports.unshift(newReport);
+      saveReports(reports);
+      return res.json(newReport);
+    }
+    // Regional Data Report
+    if (req.body.regionalData) {
+      filename = `regional_report_${timestamp}.pdf`;
+      filepath = path.join(REPORTS_DIR, filename);
+      doc = new PDFDocument();
+      stream = fs.createWriteStream(filepath);
+      doc.pipe(stream);
+      doc.fontSize(20).text('Regional Data Report', { align: 'center' });
+      doc.moveDown();
+      const { labels, datasets, year } = req.body.regionalData;
+      if (year) {
+        doc.fontSize(14).text(`Year: ${year}`, { align: 'left' });
+        doc.moveDown();
+      }
+      if (labels && datasets && datasets[0] && datasets[0].data) {
+        labels.forEach((label, i) => {
+          doc.text(`${label}: ${datasets[0].data[i]}`);
+        });
+        doc.moveDown();
+      }
+      doc.end();
+      await new Promise(resolve => stream.on('finish', resolve));
+      const reports = loadReports();
+      newReport = {
+        title: `Regional Data Report (${new Date(timestamp).toLocaleString()})`,
+        summary: 'Custom report of population and demographic breakdown by region.',
+        type: 'pdf',
+        url: `/files/reports/${filename}`,
+        date: new Date(timestamp).toISOString(),
+      };
+      reports.unshift(newReport);
+      saveReports(reports);
+      return res.json(newReport);
+    }
     // Default: Forecast report
     if (!regressors || !predictions) {
       return res.status(400).json({ error: 'Missing regressors or predictions' });
