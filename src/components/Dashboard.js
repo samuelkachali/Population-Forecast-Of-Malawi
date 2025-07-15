@@ -11,7 +11,7 @@ import {
   Button,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import DashboardHeader from './DashboardHeader';
 import UserManagement from './UserManagement';
@@ -273,11 +273,21 @@ const Dashboard = () => {
       content: 'Update your profile and preferences here.'
     }
   ];
+  const navigate = useNavigate();
   useEffect(() => {
     if (user && localStorage.getItem(`tutorialCompleted_${user.email}`) !== 'true') {
       setTourOpen(true);
     }
   }, [user]);
+
+  // Auto-navigate to the correct page for each tour step
+  useEffect(() => {
+    if (!tourOpen) return;
+    if (tourStep === 0) navigate('/dashboard'); // Sidebar
+    if (tourStep === 1 || tourStep === 2) navigate('/dashboard/forecast'); // Forecast buttons
+    if (tourStep === 3) navigate('/dashboard/reports'); // Reports
+    if (tourStep === 4) navigate('/dashboard/settings'); // Settings
+  }, [tourStep, tourOpen, navigate]);
   const handleTourNext = () => {
     if (tourStep < tourSteps.length - 1) {
       setTourStep(tourStep + 1);
