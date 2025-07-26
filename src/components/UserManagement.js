@@ -373,9 +373,9 @@ const UserManagement = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <Chip 
-                              label={user.status} 
-                              color={user.status === 'Active' ? 'success' : 'default'}
+                            <StatusChip 
+                              label={user.status && user.status.toLowerCase() === 'inactive' ? 'Deactivated' : 'Active'}
+                              status={user.status && user.status.toLowerCase() === 'inactive' ? 'Deactivated' : 'Active'}
                               size="small"
                               sx={{ 
                                 fontSize: { xs: '0.75rem', md: '0.875rem' }

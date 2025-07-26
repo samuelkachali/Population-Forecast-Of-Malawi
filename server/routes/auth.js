@@ -71,6 +71,11 @@ router.post('/signin', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
+    // Prevent login if user is deactivated
+    if (user.status && user.status.toLowerCase() === 'inactive') {
+      return res.status(403).json({ message: 'Your account has been deactivated. Please contact an administrator.' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
