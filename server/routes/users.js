@@ -15,7 +15,7 @@ router.options('/:id/make-admin', cors());
 // @access  Private/Admin
 router.get('/', protect, admin, async (req, res) => {
   try {
-    const { rows } = await db.query('SELECT id, username, email, role, created_at, last_login FROM users ORDER BY created_at DESC');
+    const { rows } = await db.query('SELECT id, username, email, role, status, created_at, last_login FROM users ORDER BY created_at DESC');
     res.json(rows);
   } catch (error) {
     console.error('Error fetching users:', error);
