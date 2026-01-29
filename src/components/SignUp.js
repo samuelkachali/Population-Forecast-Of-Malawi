@@ -43,7 +43,7 @@ const SignUp = () => {
 
   const validateStrongPassword = (pw) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
   const validateEmail = (email) => /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(email);
-  const validateName = (name) => /^[A-Za-z][A-Za-z\s\.'-]+$/.test(name) && name.trim().split(/\s+/).length >= 2 && !/\d/.test(name);
+  const validateName = (name) => /^[A-Za-z][A-Za-z\s.'-]+$/.test(name) && name.trim().split(/\s+/).length >= 2 && !/\d/.test(name);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

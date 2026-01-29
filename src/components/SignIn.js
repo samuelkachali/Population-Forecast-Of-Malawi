@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Container,
   Box,
   TextField,
   Button,
   Typography,
-  Paper,
-  CssBaseline,
   Alert,
-  useMediaQuery,
-  useTheme,
   InputAdornment,
   IconButton,
   Link,
-  Divider,
   Card,
   CardContent,
   Avatar,
@@ -23,8 +17,6 @@ import {
   CircularProgress
 } from '@mui/material';
 import {
-  Visibility,
-  VisibilityOff,
   Email as EmailIcon,
   Lock as LockIcon,
   Visibility as VisibilityIcon,
@@ -42,8 +34,6 @@ const SignIn = () => {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { setUser } = useUser();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
