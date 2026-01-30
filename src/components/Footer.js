@@ -75,7 +75,7 @@ const Footer = () => (
       </Container>
     </Box>
     {/* Divider and bottom section */}
-    <Box sx={{ background: '#4b525f52', color: '#fff', pt: 4, pb: 2 }}>
+    <Box sx={{ background: '#4b525f52', color: '#4b525f52', pt: 4, pb: 2 }}>
       <Container maxWidth="lg">
         <Box sx={{ borderTop: '1px solid #23272f', width: '100%', mb: 3, opacity: 0.2 }} />
         {/* Social icons row */}
