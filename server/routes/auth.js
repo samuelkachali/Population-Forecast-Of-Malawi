@@ -74,7 +74,7 @@ router.post('/signin', async (req, res) => {
 
     // Prevent login if user is deactivated
     if (user.status && user.status.toLowerCase() === 'inactive') {
-      return res.status(403).json({ message: 'Your account has been deactivated. Please contact an administrator.' });
+      return res.status(403).json({ message: 'Your account has been deactivated. Please recreate your account to continue.' });
     }
 
     // Migration enforcement for legacy accounts (no supabase_id)
@@ -84,7 +84,25 @@ router.post('/signin', async (req, res) => {
         if (user.migration_deadline) {
           const deadline = new Date(user.migration_deadline).getTime();
           if (!Number.isNaN(deadline) && Date.now() > deadline) {
-            await db.query("UPDATE users SET status = 'Inactive' WHERE id = $1", [user.id]);
+            const originalEmail = user.email || '';
+            const atIndex = originalEmail.indexOf('@');
+            const local = atIndex > -1 ? originalEmail.slice(0, atIndex) : originalEmail;
+            const domain = atIndex > -1 ? originalEmail.slice(atIndex + 1) : 'example.com';
+            const safeLocal = (local || 'user').replace(/[^a-zA-Z0-9._+-]/g, '');
+            const freedEmail = `${safeLocal}+deactivated-${user.id}-${Date.now()}@${domain}`;
+
+            try {
+              await db.query(
+                "UPDATE users SET status = 'Inactive', migration_completed = TRUE, email = $2, supabase_id = NULL WHERE id = $1",
+                [user.id, freedEmail]
+              );
+            } catch (e) {
+              await db.query(
+                "UPDATE users SET status = 'Inactive', email = $2, supabase_id = NULL WHERE id = $1",
+                [user.id, freedEmail]
+              );
+            }
+
             return res.status(403).json({ message: 'Your account has been deactivated. Please recreate your account to continue.' });
           }
         } else {
@@ -290,10 +308,34 @@ router.post('/deactivate-legacy', protect, async (req, res) => {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    const result = await db.query(
-      "UPDATE users SET status = 'Inactive' WHERE id = $1 AND supabase_id IS NULL RETURNING id, status",
+    const { rows } = await db.query(
+      'SELECT id, email FROM users WHERE id = $1 AND supabase_id IS NULL',
       [req.user.id]
     );
+    const existing = rows[0];
+    if (!existing) {
+      return res.status(404).json({ message: 'Legacy user not found or already linked.' });
+    }
+
+    const originalEmail = existing.email || '';
+    const atIndex = originalEmail.indexOf('@');
+    const local = atIndex > -1 ? originalEmail.slice(0, atIndex) : originalEmail;
+    const domain = atIndex > -1 ? originalEmail.slice(atIndex + 1) : 'example.com';
+    const safeLocal = (local || 'user').replace(/[^a-zA-Z0-9._+-]/g, '');
+    const freedEmail = `${safeLocal}+deactivated-${existing.id}-${Date.now()}@${domain}`;
+
+    let result;
+    try {
+      result = await db.query(
+        "UPDATE users SET status = 'Inactive', migration_completed = TRUE, email = $2, supabase_id = NULL WHERE id = $1 AND supabase_id IS NULL RETURNING id, status",
+        [req.user.id, freedEmail]
+      );
+    } catch (e) {
+      result = await db.query(
+        "UPDATE users SET status = 'Inactive', email = $2, supabase_id = NULL WHERE id = $1 AND supabase_id IS NULL RETURNING id, status",
+        [req.user.id, freedEmail]
+      );
+    }
 
     if (!result.rowCount) {
       return res.status(404).json({ message: 'Legacy user not found or already linked.' });

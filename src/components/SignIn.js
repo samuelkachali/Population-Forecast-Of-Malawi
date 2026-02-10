@@ -53,55 +53,95 @@ const SignIn = () => {
     setError('');
 
     try {
+      // 1) Try Supabase login (verified users)
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signInError) {
-        throw signInError;
-      }
+      if (!signInError) {
+        const supaUser = signInData?.user;
+        const accessToken = signInData?.session?.access_token;
 
-      const supaUser = signInData?.user;
-      const accessToken = signInData?.session?.access_token;
+        if (!accessToken) {
+          setError('Sign-in failed: missing session. Please verify your email and try again.');
+          return;
+        }
 
-      if (!accessToken) {
-        setError('Sign-in failed: missing session. Please verify your email and try again.');
+        if (supaUser && supaUser.email_confirmed_at == null) {
+          await supabase.auth.signOut();
+          setError('Please verify your email before signing in. Check your inbox/spam.');
+          return;
+        }
+
+        const syncRes = await fetch(`${API_BASE_URL}/api/auth/supabase-sync`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!syncRes.ok) {
+          const syncText = await syncRes.text();
+          throw new Error(syncText || 'Failed to sync user with backend.');
+        }
+
+        const syncData = await syncRes.json();
+
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('user', JSON.stringify(syncData.user));
+        setUser(syncData.user);
+
+        if (syncData.migration && syncData.migration.required) {
+          setMigration(syncData.migration);
+          setMigrationDialogOpen(true);
+          deactivateStartedRef.current = false;
+        } else {
+          navigate('/dashboard');
+        }
+
         return;
       }
 
-      if (supaUser && supaUser.email_confirmed_at == null) {
-        await supabase.auth.signOut();
-        setError('Please verify your email before signing in. Check your inbox/spam.');
+      // 2) Supabase failed - fall back to legacy Neon password auth
+      // If the user hasn't recreated their account in Supabase yet, this enables a one-time login.
+      if (signInError && signInError.name === 'AuthApiError') {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setUser(data.user);
+
+          const migrationPayload = (data.migration && data.migration.required)
+            ? data.migration
+            : {
+              required: true,
+              deadline: new Date(Date.now() + 30 * 1000).toISOString(),
+              message: 'Action required: Please recreate your account to verify your email. This account will be deactivated in 30 seconds.',
+            };
+
+          setMigration(migrationPayload);
+          setMigrationDialogOpen(true);
+          deactivateStartedRef.current = false;
+        } else {
+          const errorMessage = data.detail
+            ? `${data.message} - ${data.detail}`
+            : data.message || 'Invalid email or password.';
+          setError(errorMessage);
+        }
+
         return;
       }
 
-      const syncRes = await fetch(`${API_BASE_URL}/api/auth/supabase-sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!syncRes.ok) {
-        const syncText = await syncRes.text();
-        throw new Error(syncText || 'Failed to sync user with backend.');
-      }
-
-      const syncData = await syncRes.json();
-
-      localStorage.setItem('token', accessToken);
-      localStorage.setItem('user', JSON.stringify(syncData.user));
-      setUser(syncData.user);
-
-      if (syncData.migration && syncData.migration.required) {
-        setMigration(syncData.migration);
-        setMigrationDialogOpen(true);
-        deactivateStartedRef.current = false;
-      } else {
-        navigate('/dashboard');
-      }
+      throw signInError;
     } catch (err) {
       console.error('SignIn: Error during sign-in:', err);
       const message = err?.message || 'Failed to sign in. Please try again.';
