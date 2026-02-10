@@ -85,7 +85,7 @@ const UserManagement = () => {
     const fetchUsers = async () => {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('supabaseToken') || localStorage.getItem('token');
       console.log('UserManagement fetch token:', token);
       const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
       const url = `${API_BASE_URL}/api/users`;
@@ -137,7 +137,7 @@ const UserManagement = () => {
   }, []);
 
   const handleApiCall = async (url, options) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('supabaseToken') || localStorage.getItem('token');
     try {
       const response = await fetch(url, {
         ...options,

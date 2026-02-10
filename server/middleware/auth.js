@@ -102,11 +102,11 @@ const protect = async (req, res, next) => {
 
 const admin = (req, res, next) => {
   if (req.method === 'OPTIONS') return next();
-  if (req.user && typeof req.user.role === 'string' && req.user.role.toLowerCase() === 'admin') {
+  if (req.user && typeof req.user.role === 'string' && req.user.role.trim().toLowerCase() === 'admin') {
     next();
   } else {
     res.status(403).json({ message: 'Not authorized as an admin' });
   }
 };
 
-module.exports = { protect, admin }; 
+module.exports = { protect, admin };
