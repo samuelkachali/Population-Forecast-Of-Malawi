@@ -110,8 +110,8 @@ const StyledInputBase = styled(InputBase)(({ theme, scrolled }) => ({
 
 const navItems = [
   { label: 'Home', path: '/' },
-  { label: 'Forecasts', path: '/signin' },
-  { label: 'Data', path: '/data' },
+  { label: 'Forecasts', path: '/dashboard' },
+  { label: 'Data', path: 'https://opendata.gov.mw' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ];
@@ -181,7 +181,15 @@ const Header = ({ forceWhite, onToggleSidebar }) => {
         </BrandTypography>
         <Box sx={{ flexGrow: 1 }} />
         {!isMobile && navItems.map((item) => (
-          <NavLink key={item.label} onClick={() => item.label === 'Contact' ? handleContactOpen() : navigate(item.path)} scrolled={effectiveScrolled ? 1 : 0}>
+          <NavLink key={item.label} onClick={() => {
+            if (item.label === 'Contact') {
+              handleContactOpen();
+            } else if (item.path.startsWith('http')) {
+              window.open(item.path, '_blank', 'noopener,noreferrer');
+            } else {
+              navigate(item.path);
+            }
+          }} scrolled={effectiveScrolled ? 1 : 0}>
             {item.label}
           </NavLink>
         ))}
