@@ -348,7 +348,7 @@ const About = () => {
                 <Divider sx={{ width: 60, borderBottomWidth: 3, borderColor: '#257a5a', mb: 2 }} />
                 <Typography variant="body1" sx={{ color: '#333', mb: 2 }}>
                   <b>Samuel D. Kachali</b> is the developer of the Population Forecast of Malawi (PFOM) app. Passionate about data science, software engineering, and digital transformation for Africa, Samuel built PFOM to make population data more accessible and actionable for all Malawians.<br/><br/>
-                  Samuel is experienced in web development, data analytics, and building user-friendly digital tools. He is committed to using technology for social good and national development.
+                  Samuel is experienced in web development, modeling with python, data analytics, and building user-friendly digital tools. He is committed to using technology for social good and national development.
                       </Typography>
                     </Box>
               {/* Right: Developer Photo */}
