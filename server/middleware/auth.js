@@ -11,7 +11,11 @@ const supabase = (supabaseUrl && supabaseAnonKey)
 
 const tryVerifyCustomJwt = (token) => {
   if (!process.env.JWT_SECRET) return null;
-  return jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return null;
+  }
 };
 
 const tryVerifySupabaseToken = async (token) => {
