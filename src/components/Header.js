@@ -111,7 +111,7 @@ const StyledInputBase = styled(InputBase)(({ theme, scrolled }) => ({
 const navItems = [
   { label: 'Home', path: '/' },
   { label: 'Forecasts', path: '/dashboard' },
-  { label: 'Data', path: 'https://opendata.gov.mw' },
+  { label: 'Data', path: 'https://data.worldbank.org/country/malawi' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ];
