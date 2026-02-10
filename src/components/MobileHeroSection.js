@@ -188,7 +188,7 @@ const MobileHeroSection = () => {
           fontWeight={700}
           sx={{ color: theme.palette.success.light, letterSpacing: 1, mb: 1, textTransform: 'uppercase', fontSize: '0.9rem', textAlign: 'center' }}
         >
-          Forecasting <span style={{ color: '#f88070' }}>Malawi's Future</span>—Powered by <span style={{ color: '#f88070' }}>Data</span>.
+          Forecasting <span style={{ color: '#f88070' }}>Malawi's Future</span>
         </Typography>
         {/* Two-line centered heading */}
         <Typography
