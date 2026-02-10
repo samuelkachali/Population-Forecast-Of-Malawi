@@ -9,35 +9,35 @@ const columns = [
   {
     title: 'About',
     links: [
-      { label: 'Population Forecast Of Malawi', href: '#' },
-      { label: 'Developer', href: '#' },
+      { label: 'Population Forecast Of Malawi', href: '/about' },
+      { label: 'Developer', href: 'https://github.com/samuelkachali/Population-Forecast-Of-Malawi' },
     ],
   },
   {
     title: 'Quick Statistics',
     links: [
-      { label: 'Latest Census', href: '#' },
-      { label: 'Population Growth', href: '#' },
-      { label: 'Urbanization Rate', href: '#' },
-      { label: 'Median Age', href: '#' },
+      { label: 'Latest Census', href: '/dashboard' },
+      { label: 'Population Growth', href: '/dashboard' },
+      { label: 'Urbanization Rate', href: '/dashboard' },
+      { label: 'Median Age', href: '/dashboard' },
     ],
   },
   {
     title: 'Government Resources',
     links: [
-      { label: 'Ministry of Health', href: '#' },
-      { label: 'Ministry of Education', href: '#' },
-      { label: 'Ministry of Agriculture', href: '#' },
-      { label: 'National Planning', href: '#' },
+      { label: 'Ministry of Health', href: 'https://www.health.gov.mw' },
+      { label: 'Ministry of Education', href: 'https://www.education.gov.mw' },
+      { label: 'Ministry of Agriculture', href: 'https://www.agriculture.gov.mw' },
+      { label: 'National Planning', href: 'https://www.npcc.mw' },
     ],
   },
   {
     title: 'External Resources',
     links: [
-      { label: 'UN Population Division', href: '#' },
-      { label: 'World Bank Data', href: '#' },
-      { label: 'African Development Bank', href: '#' },
-      { label: 'Open Data Portal', href: '#' },
+      { label: 'UN Population Division', href: 'https://population.un.org' },
+      { label: 'World Bank Data', href: 'https://data.worldbank.org/country/malawi' },
+      { label: 'African Development Bank', href: 'https://www.afdb.org/en/countries/southern-africa/malawi' },
+      { label: 'Open Data Portal', href: 'https://opendata.gov.mw' },
     ],
   },
 ];
@@ -80,10 +80,10 @@ const Footer = () => (
         <Box sx={{ borderTop: '1px solid #23272f', width: '100%', mb: 3, opacity: 0.2 }} />
         {/* Social icons row */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 2 }}>
-          <Link href="#" color="inherit" aria-label="Facebook" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><FacebookIcon fontSize="medium" /></Link>
-          <Link href="#" color="inherit" aria-label="LinkedIn" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><LinkedInIcon fontSize="medium" /></Link>
-          <Link href="#" color="inherit" aria-label="Instagram" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><InstagramIcon fontSize="medium" /></Link>
-          <Link href="#" color="inherit" aria-label="YouTube" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><YouTubeIcon fontSize="medium" /></Link>
+          <Link href="https://www.facebook.com" color="inherit" aria-label="Facebook" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><FacebookIcon fontSize="medium" /></Link>
+          <Link href="https://www.linkedin.com" color="inherit" aria-label="LinkedIn" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><LinkedInIcon fontSize="medium" /></Link>
+          <Link href="https://www.instagram.com" color="inherit" aria-label="Instagram" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><InstagramIcon fontSize="medium" /></Link>
+          <Link href="https://www.youtube.com" color="inherit" aria-label="YouTube" sx={{ opacity: 0.8, '&:hover': { color: 'primary.light', opacity: 1 } }}><YouTubeIcon fontSize="medium" /></Link>
         </Box>
         {/* Copyright */}
         <Box sx={{ textAlign: 'center', opacity: 0.7, fontSize: 14 }}>
