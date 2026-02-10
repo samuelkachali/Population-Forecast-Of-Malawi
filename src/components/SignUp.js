@@ -23,7 +23,8 @@ import {
   Email as EmailIcon,
   Lock as LockIcon,
   Person,
-  PersonAdd
+  PersonAdd,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -129,6 +130,22 @@ const SignUp = () => {
         px: 2,
       }}
     >
+      {/* Back Arrow Button */}
+      <IconButton
+        onClick={() => navigate('/')}
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+          },
+        }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
       <Fade in timeout={800}>
         <Card
           sx={{

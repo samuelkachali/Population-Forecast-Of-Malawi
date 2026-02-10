@@ -27,6 +27,7 @@ import {
   Lock as LockIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { Fade } from '@mui/material';
@@ -235,6 +236,22 @@ const SignIn = () => {
         px: { xs: 2, sm: 3, md: 4 }, // horizontal padding only
       }}
     >
+      {/* Back Arrow Button */}
+      <IconButton
+        onClick={() => navigate('/')}
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+          },
+        }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
       <Fade in timeout={1000}>
         <Card
           sx={{
