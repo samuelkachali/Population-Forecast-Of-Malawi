@@ -30,7 +30,14 @@ router.post('/signup', async (req, res) => {
   try {
     // Check if any users exist to determine role
     const existingUsers = await db.query('SELECT id FROM users LIMIT 1');
-    const role = existingUsers.rows.length === 0 ? 'admin' : 'user';
+    let role = existingUsers.rows.length === 0 ? 'admin' : 'user';
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (adminEmails.includes(String(email || '').toLowerCase())) {
+      role = 'admin';
+    }
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
@@ -219,6 +226,10 @@ router.post('/supabase-sync', protect, async (req, res) => {
         }
       }
 
+      if (userRow && typeof userRow.role === 'string') {
+        userRow.role = userRow.role.toLowerCase();
+      }
+
       return res.json({ user: userRow, migration });
     }
 
@@ -228,7 +239,14 @@ router.post('/supabase-sync', protect, async (req, res) => {
       : (req.user.email.split('@')[0] || 'user');
 
     const existingUsers = await db.query('SELECT id FROM users LIMIT 1');
-    const role = existingUsers.rows.length === 0 ? 'admin' : 'user';
+    let role = existingUsers.rows.length === 0 ? 'admin' : 'user';
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (adminEmails.includes(String(req.user.email || '').toLowerCase())) {
+      role = 'admin';
+    }
 
     // Create a random password hash to satisfy schemas that require password_hash
     const randomPassword = `${req.user.supabase_id}-${Date.now()}-${Math.random()}`;
@@ -247,7 +265,11 @@ router.post('/supabase-sync', protect, async (req, res) => {
       // ignore if column does not exist
     }
 
-    return res.status(201).json({ user: result.rows[0], migration: null });
+    const createdUser = result.rows[0];
+    if (createdUser && typeof createdUser.role === 'string') {
+      createdUser.role = createdUser.role.toLowerCase();
+    }
+    return res.status(201).json({ user: createdUser, migration: null });
   } catch (error) {
     console.error('Server error during supabase-sync:', error);
     return res.status(500).json({ message: 'Server error during supabase-sync.', detail: error.message });

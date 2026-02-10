@@ -128,7 +128,7 @@ const Sidebar = ({ open, onToggle }) => {
       <Box sx={{ px: 2, pb: 2 }}>
         <Divider sx={{ mb: 1.5, borderColor: '#e0e0e0' }} />
         {systemItems.map((item) => {
-          if (item.text === 'User Management' && (!user || String(user.role || '').toLowerCase() !== 'admin')) return null;
+          if (item.text === 'User Management' && (!user || String(user.role || '').trim().toLowerCase() !== 'admin')) return null;
           const isActive = location.pathname === item.path;
           return (
             <ListItemButton
