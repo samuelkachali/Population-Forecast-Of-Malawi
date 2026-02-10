@@ -26,7 +26,7 @@ const imageChallenges = [
 ];
 
 const PopulationChallengesSection = () => (
-  <Box sx={{ my: 8, py: 6, background: '#f5faff', borderRadius: 4 }}>
+  <Box sx={{ my: 8, py: 6, background: '#f5faff', borderRadius: 4, px: { xs: 2, sm: 0 } }}>
     <Typography variant="h4" fontWeight={700} align="center" mb={4} sx={{ fontSize: { xs: '1.4rem', sm: '2rem', md: '2.5rem' } }}>
       Challenges of Population Growth
     </Typography>

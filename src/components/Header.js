@@ -126,6 +126,14 @@ const Header = ({ forceWhite, onToggleSidebar }) => {
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
   const [contactError, setContactError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + ' site:opendata.gov.mw OR site:data.worldbank.org/country/malawi')}`;
+      window.open(googleSearchUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const handleContactOpen = () => setContactOpen(true);
   const handleContactClose = () => {
@@ -245,7 +253,14 @@ const Header = ({ forceWhite, onToggleSidebar }) => {
           <SearchIconWrapper scrolled={effectiveScrolled ? 1 : 0}>
             <SearchIcon />
           </SearchIconWrapper>
-          <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} scrolled={effectiveScrolled ? 1 : 0} />
+          <StyledInputBase 
+            placeholder="Search…" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
+            inputProps={{ 'aria-label': 'search' }} 
+            scrolled={effectiveScrolled ? 1 : 0} 
+          />
         </Search>
         {isMobile && (
           <IconButton edge="end" color="inherit" onClick={onToggleSidebar}>

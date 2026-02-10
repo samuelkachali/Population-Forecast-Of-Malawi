@@ -16,7 +16,7 @@ const DashboardCTASection = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        px: { xs: 2, md: 6 },
+        px: { xs: 3, md: 6 },
       }}
     >
       <Box
@@ -26,7 +26,7 @@ const DashboardCTASection = () => {
           maxWidth: 440,
           width: '100%',
           mx: 'auto',
-          px: { xs: 2, sm: 4 },
+          px: { xs: 3, sm: 4 },
           py: { xs: 3, sm: 6 },
           borderRadius: 5,
           boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.13)',

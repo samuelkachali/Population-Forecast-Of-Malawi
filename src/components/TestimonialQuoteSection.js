@@ -12,7 +12,7 @@ const testimonial = {
 };
 
 const TestimonialQuoteSection = () => (
-  <Box sx={{ my: 8, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+  <Box sx={{ my: 8, display: 'flex', justifyContent: 'center', alignItems: 'center', px: { xs: 2, sm: 0 } }}>
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}

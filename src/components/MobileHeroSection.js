@@ -55,7 +55,7 @@ const menuItems = [
 function FixedPFOMBar({ onMenuOpen }) {
   return (
     <Slide appear={false} direction="down" in={useScrollTrigger({ threshold: 10 })}>
-      <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bgcolor: 'rgba(24,28,36,0.98)', zIndex: 1200, boxShadow: 1, px: 2, py: 1.2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bgcolor: 'rgba(24,28,36,0.98)', zIndex: 1200, boxShadow: 1, px: 3, py: 1.2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#fff', fontSize: '1rem', letterSpacing: 0.5 }}>
           PFOM
         </Typography>
@@ -118,7 +118,7 @@ const MobileHeroSection = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            px: 2,
+            px: 3,
             pt: 2.5,
           }}
         >
@@ -175,7 +175,7 @@ const MobileHeroSection = () => {
           zIndex: 2,
           width: '100%',
           minHeight: '80vh',
-          px: 2,
+          px: 3,
           pt: 8, // Add more top padding for mobile
           display: 'flex',
           flexDirection: 'column',

@@ -36,7 +36,7 @@ const FeatureCardsSection = () => {
   }, []);
 
   return (
-    <Box sx={{ my: 8, px: { xs: 2, sm: 4, md: 0 }, minHeight: 320 }}>
+    <Box sx={{ my: 8, px: { xs: 3, sm: 4, md: 0 }, minHeight: 320 }}>
       <Typography variant="h4" fontWeight={800} align="center" mb={4} sx={{ color: 'rgba(40, 40, 53, 0.83)', letterSpacing: 1, fontSize: { xs: '1.3rem', sm: '1.7rem', md: '2.3rem' } }}>
         How it works
       </Typography>
