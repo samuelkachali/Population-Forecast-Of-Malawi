@@ -15,8 +15,6 @@ import {
   FormControlLabel,
   Checkbox,
   CircularProgress,
-  Snackbar,
-  Slide,
   Fade
 } from '@mui/material';
 import {
@@ -40,17 +38,10 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
-
-  useEffect(() => {
-    if (location.state && location.state.verificationSent) {
-      setSnackbarOpen(true);
-    }
-  }, [location.state]);
 
   const validateStrongPassword = (pw) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
   const validateEmail = (email) => /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(email);
@@ -118,7 +109,6 @@ const SignUp = () => {
         }
       }
 
-      setSnackbarOpen(true);
       navigate('/signin', { state: { verificationSent: true } });
     } catch (err) {
       const message = err?.message || 'Failed to sign up. Please try again.';
@@ -320,15 +310,6 @@ const SignUp = () => {
           </CardContent>
         </Card>
       </Fade>
-
-      <Snackbar
-        open={snackbarOpen}
-        onClose={() => setSnackbarOpen(false)}
-        autoHideDuration={6000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        TransitionComponent={(props) => <Slide {...props} direction="up" />}
-        message="Verification email has been sent to your email (check inbox/spam). Please verify before signing in."
-      />
     </Box>
   );
 };

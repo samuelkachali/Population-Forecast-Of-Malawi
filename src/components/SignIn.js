@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   TextField,
@@ -18,7 +18,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Snackbar,
+  Slide
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -41,11 +43,21 @@ const SignIn = () => {
   const [migration, setMigration] = useState(null);
   const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const deactivateStartedRef = useRef(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser } = useUser();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+
+  useEffect(() => {
+    if (location.state && location.state.verificationSent) {
+      setSnackbarOpen(true);
+      // Clear the state so it doesn't show again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -429,6 +441,15 @@ const SignIn = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        TransitionComponent={(props) => <Slide {...props} direction="up" />}
+        message="Verification email has been sent to your email (check inbox/spam). Please verify before signing in."
+      />
     </Box>
   );
 };
