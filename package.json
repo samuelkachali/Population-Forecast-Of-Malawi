@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.2",
     "@mui/material": "^7.1.1",
+    "@supabase/supabase-js": "^2.49.1",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "axios": "^1.10.0",

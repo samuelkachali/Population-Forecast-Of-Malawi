@@ -29,6 +29,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { Fade } from '@mui/material';
 import { useUser } from '../contexts/UserContext';
+import { supabase } from '../supabaseClient';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -52,34 +53,59 @@ const SignIn = () => {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
+      const supaUser = signInData?.user;
+      const accessToken = signInData?.session?.access_token;
+
+      if (!accessToken) {
+        setError('Sign-in failed: missing session. Please verify your email and try again.');
+        return;
+      }
+
+      if (supaUser && supaUser.email_confirmed_at == null) {
+        await supabase.auth.signOut();
+        setError('Please verify your email before signing in. Check your inbox/spam.');
+        return;
+      }
+
+      const syncRes = await fetch(`${API_BASE_URL}/api/auth/supabase-sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
-        if (data.migration && data.migration.required) {
-          setMigration(data.migration);
-          setMigrationDialogOpen(true);
-          deactivateStartedRef.current = false;
-        } else {
-          navigate('/dashboard');
-        }
+
+      if (!syncRes.ok) {
+        const syncText = await syncRes.text();
+        throw new Error(syncText || 'Failed to sync user with backend.');
+      }
+
+      const syncData = await syncRes.json();
+
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('user', JSON.stringify(syncData.user));
+      setUser(syncData.user);
+
+      if (syncData.migration && syncData.migration.required) {
+        setMigration(syncData.migration);
+        setMigrationDialogOpen(true);
+        deactivateStartedRef.current = false;
       } else {
-        const errorMessage = data.detail
-          ? `${data.message} - ${data.detail}`
-          : data.message || 'Invalid email or password.';
-        setError(errorMessage);
+        navigate('/dashboard');
       }
     } catch (err) {
       console.error('SignIn: Error during sign-in:', err);
-      setError('Failed to connect to the server. Please try again.');
+      const message = err?.message || 'Failed to sign in. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -117,7 +143,7 @@ const SignIn = () => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          await fetch(`${API_BASE_URL}/api/auth/deactivate-legacy`, {
+          await fetch(`${API_BASE_URL}/api/auth/deactivate-account`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -128,6 +154,11 @@ const SignIn = () => {
       } catch (e) {
         // ignore
       } finally {
+        try {
+          await supabase.auth.signOut();
+        } catch {
+          // ignore
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);

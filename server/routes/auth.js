@@ -157,11 +157,51 @@ router.post('/supabase-sync', protect, async (req, res) => {
 
     // If middleware already mapped to a Neon row, just return it.
     if (req.user.id) {
-      const { rows } = await db.query(
-        'SELECT id, username, email, role, last_login, supabase_id, status FROM users WHERE id = $1',
-        [req.user.id]
-      );
-      return res.json({ user: rows[0] });
+      // Migration notice after Supabase login (forced migration UX)
+      // If you want this behavior only for certain cohorts, adjust this logic.
+      let migration = null;
+
+      // Read user row + determine if migration modal should be shown
+      let userRow;
+      try {
+        const { rows } = await db.query(
+          'SELECT id, username, email, role, last_login, supabase_id, status, migration_deadline, migration_completed FROM users WHERE id = $1',
+          [req.user.id]
+        );
+        userRow = rows[0];
+      } catch (e) {
+        const { rows } = await db.query(
+          'SELECT id, username, email, role, last_login, supabase_id, status, migration_deadline FROM users WHERE id = $1',
+          [req.user.id]
+        );
+        userRow = rows[0];
+      }
+
+      const migrationCompleted = Boolean(userRow && userRow.migration_completed);
+
+      if (!migrationCompleted) {
+        try {
+          await db.query(
+            "UPDATE users SET migration_deadline = COALESCE(migration_deadline, NOW() + INTERVAL '30 seconds') WHERE id = $1",
+            [req.user.id]
+          );
+        } catch (e) {
+          // ignore if migration_deadline column doesn't exist
+        }
+
+        const d = userRow && userRow.migration_deadline
+          ? new Date(userRow.migration_deadline)
+          : new Date(Date.now() + 30 * 1000);
+        if (d && !Number.isNaN(d.getTime())) {
+          migration = {
+            required: true,
+            deadline: d.toISOString(),
+            message: 'Action required: Please recreate your account to verify your email. This account will be deactivated in 30 seconds.',
+          };
+        }
+      }
+
+      return res.json({ user: userRow, migration });
     }
 
     // Create a new Neon user for Supabase-authenticated user
@@ -182,10 +222,63 @@ router.post('/supabase-sync', protect, async (req, res) => {
       [username, req.user.email, password_hash, role, req.user.supabase_id]
     );
 
-    return res.status(201).json({ user: result.rows[0] });
+    // New Supabase-created users should not see the forced migration modal
+    try {
+      await db.query('UPDATE users SET migration_completed = TRUE WHERE id = $1', [result.rows[0].id]);
+    } catch (e) {
+      // ignore if column does not exist
+    }
+
+    return res.status(201).json({ user: result.rows[0], migration: null });
   } catch (error) {
     console.error('Server error during supabase-sync:', error);
     return res.status(500).json({ message: 'Server error during supabase-sync.', detail: error.message });
+  }
+});
+
+// Deactivate the currently authenticated account (Supabase or legacy JWT)
+// Requires Authorization: Bearer <token>
+router.post('/deactivate-account', protect, async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const { rows } = await db.query('SELECT id, email FROM users WHERE id = $1', [req.user.id]);
+    const existing = rows[0];
+    if (!existing) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const originalEmail = existing.email || '';
+    const atIndex = originalEmail.indexOf('@');
+    const local = atIndex > -1 ? originalEmail.slice(0, atIndex) : originalEmail;
+    const domain = atIndex > -1 ? originalEmail.slice(atIndex + 1) : 'example.com';
+    const safeLocal = (local || 'user').replace(/[^a-zA-Z0-9._+-]/g, '');
+    const freedEmail = `${safeLocal}+deactivated-${existing.id}-${Date.now()}@${domain}`;
+
+    let result;
+    try {
+      result = await db.query(
+        "UPDATE users SET status = 'Inactive', migration_completed = TRUE, email = $2, supabase_id = NULL WHERE id = $1 RETURNING id, status",
+        [req.user.id, freedEmail]
+      );
+    } catch (e) {
+      // Fallback if migration_completed column doesn't exist yet
+      result = await db.query(
+        "UPDATE users SET status = 'Inactive', email = $2, supabase_id = NULL WHERE id = $1 RETURNING id, status",
+        [req.user.id, freedEmail]
+      );
+    }
+
+    if (!result.rowCount) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    return res.json({ message: 'Account deactivated.', user: result.rows[0] });
+  } catch (error) {
+    console.error('Server error during deactivate-account:', error);
+    return res.status(500).json({ message: 'Server error during deactivate-account.', detail: error.message });
   }
 });
 

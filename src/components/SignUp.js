@@ -28,6 +28,7 @@ import {
   PersonAdd
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
@@ -81,22 +82,47 @@ const SignUp = () => {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: username,
+          },
+        },
       });
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setSnackbarOpen(true);
-        navigate('/signin');
-      } else {
-        setError(data.message || 'An error occurred during sign up.');
+
+      if (signUpError) {
+        throw signUpError;
       }
+
+      const accessToken = signUpData?.session?.access_token;
+      if (accessToken) {
+        try {
+          const syncRes = await fetch(`${API_BASE_URL}/api/auth/supabase-sync`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ username }),
+          });
+
+          if (syncRes.ok) {
+            const syncData = await syncRes.json();
+            localStorage.setItem('token', accessToken);
+            localStorage.setItem('user', JSON.stringify(syncData.user));
+          }
+        } catch {
+          // ignore sync errors during signup; user can still verify email then sign in
+        }
+      }
+
+      setSnackbarOpen(true);
+      navigate('/signin', { state: { verificationSent: true } });
     } catch (err) {
-      setError('Failed to connect to the server. Please try again.');
+      const message = err?.message || 'Failed to sign up. Please try again.';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
