@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   TextField,
@@ -15,6 +15,8 @@ import {
   FormControlLabel,
   Checkbox,
   CircularProgress,
+  Snackbar,
+  Slide,
   Fade
 } from '@mui/material';
 import {
@@ -37,9 +39,17 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://population-forecast-of-malawi.onrender.com";
+
+  useEffect(() => {
+    if (location.state && location.state.verificationSent) {
+      setSnackbarOpen(true);
+    }
+  }, [location.state]);
 
   const validateStrongPassword = (pw) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
   const validateEmail = (email) => /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(email);
@@ -80,6 +90,7 @@ const SignUp = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        setSnackbarOpen(true);
         navigate('/signin');
       } else {
         setError(data.message || 'An error occurred during sign up.');
@@ -283,6 +294,15 @@ const SignUp = () => {
           </CardContent>
         </Card>
       </Fade>
+
+      <Snackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        TransitionComponent={(props) => <Slide {...props} direction="up" />}
+        message="Verification email has been sent to your email (check inbox/spam). Please verify before signing in."
+      />
     </Box>
   );
 };

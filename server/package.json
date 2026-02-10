@@ -8,7 +8,8 @@
     "jsonwebtoken": "^9.0.2",
     "pdfkit": "^0.17.1",
     "axios": "^1.10.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "@supabase/supabase-js": "^2.49.1"
   },
   "scripts": {
     "start": "node server.js"

@@ -13,12 +13,21 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://population-forecast-of-malawi.vercel.app'
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://population-forecast-of-malawi.vercel.app'
-  ],
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+    return callback(null, false);
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 

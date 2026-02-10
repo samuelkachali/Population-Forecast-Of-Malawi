@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,7 +14,11 @@ import {
   Avatar,
   FormControlLabel,
   Checkbox,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -33,6 +37,10 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [migration, setMigration] = useState(null);
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(null);
+  const deactivateStartedRef = useRef(false);
   const navigate = useNavigate();
   const { setUser } = useUser();
 
@@ -56,7 +64,13 @@ const SignIn = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-        navigate('/dashboard');
+        if (data.migration && data.migration.required) {
+          setMigration(data.migration);
+          setMigrationDialogOpen(true);
+          deactivateStartedRef.current = false;
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         const errorMessage = data.detail
           ? `${data.message} - ${data.detail}`
@@ -70,6 +84,62 @@ const SignIn = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!migrationDialogOpen || !migration?.deadline) {
+      setSecondsLeft(null);
+      return;
+    }
+
+    const calc = () => {
+      const ms = new Date(migration.deadline).getTime() - Date.now();
+      const s = Math.max(0, Math.ceil(ms / 1000));
+      setSecondsLeft(s);
+      return s;
+    };
+
+    calc();
+    const t = setInterval(() => {
+      const s = calc();
+      if (s <= 0) {
+        clearInterval(t);
+      }
+    }, 500);
+
+    return () => clearInterval(t);
+  }, [migrationDialogOpen, migration?.deadline]);
+
+  useEffect(() => {
+    const doDeactivate = async () => {
+      if (deactivateStartedRef.current) return;
+      deactivateStartedRef.current = true;
+
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          await fetch(`${API_BASE_URL}/api/auth/deactivate-legacy`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+        }
+      } catch (e) {
+        // ignore
+      } finally {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setMigrationDialogOpen(false);
+        navigate('/signup', { state: { verificationSent: true } });
+      }
+    };
+
+    if (migrationDialogOpen && secondsLeft === 0) {
+      doDeactivate();
+    }
+  }, [migrationDialogOpen, secondsLeft, API_BASE_URL, navigate, setUser]);
 
   return (
     <Box
@@ -248,6 +318,46 @@ const SignIn = () => {
           </CardContent>
         </Card>
       </Fade>
+
+      <Dialog
+        open={migrationDialogOpen}
+        onClose={() => {
+          setMigrationDialogOpen(false);
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Action Required: Recreate Your Account</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            {migration?.message || 'Please recreate your account to verify your email.'}
+          </Typography>
+          {migration?.deadline && (
+            <Typography variant="body2" color="text.secondary">
+              Deactivation deadline: {new Date(migration.deadline).toLocaleString()}
+            </Typography>
+          )}
+          {typeof secondsLeft === 'number' && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              This account will be deactivated in {secondsLeft}s.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setMigrationDialogOpen(false);
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              setUser(null);
+              navigate('/signup', { state: { verificationSent: true } });
+            }}
+          >
+            Create New Account
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
